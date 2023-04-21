@@ -1,0 +1,15 @@
+[package]
+name = "cvt"
+version = "1.0.0"
+description = "CVT verification functions"
+authors = ["Jorge Navas (jorge@certora.com)"]
+license = "Apache-2.0"
+edition = "2021"
+
+[dependencies]
+solana-program = "1.14.10"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name="cvt"
+path= "src/cvt.rs"
