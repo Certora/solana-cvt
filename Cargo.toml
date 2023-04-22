@@ -12,4 +12,3 @@ solana-program = "1.14.10"
 [lib]
 crate-type = ["cdylib", "lib"]
 name="cvt"
-path= "src/cvt.rs"

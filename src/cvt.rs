@@ -1,4 +1,4 @@
-mod cvt_stubs;
+use super::cvt_stubs;
 
 use {
     solana_program:: {
