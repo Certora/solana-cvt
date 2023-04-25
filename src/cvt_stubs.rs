@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use {
     solana_program::{
         account_info::{AccountInfo},
@@ -95,5 +96,17 @@ extern "C" {
 pub fn CVT_nondet_pubkey_impl() -> Pubkey {
     unsafe {
         return mk_pubkey_unchecked();
+    }
+}
+
+extern "C" {
+    #[allow(improper_ctypes)]
+    fn mk_btree_map_unchecked() -> BTreeMap<String, u8>;
+}
+
+#[allow(non_snake_case)]
+pub fn CVT_nondet_btree_map_impl() -> BTreeMap<String, u8> {
+    unsafe {
+        return mk_btree_map_unchecked()
     }
 }

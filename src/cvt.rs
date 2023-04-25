@@ -1,5 +1,6 @@
 use super::cvt_stubs;
 
+use std::collections::BTreeMap;
 use {
     solana_program:: {
         account_info::{AccountInfo},
@@ -78,4 +79,10 @@ pub fn CVT_nondet_account_info() -> AccountInfo<'static> {
 #[allow(non_snake_case)]
 pub fn CVT_nondet_pubkey() -> Pubkey {
     cvt_stubs::CVT_nondet_pubkey_impl()
+}
+
+#[inline(never)]
+#[allow(non_snake_case)]
+pub fn CVT_nondet_btree_map() -> BTreeMap<String, u8> {
+    cvt_stubs::CVT_nondet_btree_map_impl()
 }
