@@ -8,7 +8,6 @@ use {
     }
 };
 
-
 #[inline(never)]
 #[allow(non_snake_case)]
 pub fn CVT_assume(c: bool){
@@ -71,6 +70,21 @@ pub fn CVT_uninterpreted_usize() ->  usize { cvt_stubs::CVT_uninterpreted_usize_
 
 #[inline(never)]
 #[allow(non_snake_case)]
+// TODO: use macro to allow arrays of different sizes without having a separate function per size
+pub fn CVT_nondet_array_of_32_bytes() -> [u8; 32] {
+    cvt_stubs::CVT_nondet_pubkey_impl().to_bytes()
+}
+
+#[inline(never)]
+#[allow(non_snake_case)]
+pub fn CVT_nondet_btree_map() -> BTreeMap<String, u8> {
+    cvt_stubs::CVT_nondet_btree_map_impl()
+}
+
+/* Stubs for solana_program */
+
+#[inline(never)]
+#[allow(non_snake_case)]
 pub fn CVT_nondet_account_info() -> AccountInfo<'static> {
     cvt_stubs::CVT_nondet_account_info_impl()
 }
@@ -79,10 +93,4 @@ pub fn CVT_nondet_account_info() -> AccountInfo<'static> {
 #[allow(non_snake_case)]
 pub fn CVT_nondet_pubkey() -> Pubkey {
     cvt_stubs::CVT_nondet_pubkey_impl()
-}
-
-#[inline(never)]
-#[allow(non_snake_case)]
-pub fn CVT_nondet_btree_map() -> BTreeMap<String, u8> {
-    cvt_stubs::CVT_nondet_btree_map_impl()
 }
