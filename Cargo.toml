@@ -8,6 +8,7 @@ edition = "2021"
 
 [dependencies]
 solana-program = "1.14.10"
+anchor-lang = "0.26.0" 
 
 [lib]
 crate-type = ["cdylib", "lib"]
