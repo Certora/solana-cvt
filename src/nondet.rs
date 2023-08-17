@@ -43,6 +43,8 @@ use super::cvt;
 nondet_impl! { (), (),  "No nondet value for  unit" }
 nondet_impl! { u8, cvt::CVT_nondet_u8(), "Nondet for u8" }
 nondet_impl! { i8, cvt::CVT_nondet_i8(), "Nondet for i8" }
+nondet_impl! { u16, cvt::CVT_nondet_u16(), "Nondet for u16" }
+nondet_impl! { i16, cvt::CVT_nondet_i16(), "Nondet for i16" }
 nondet_impl! { u32, cvt::CVT_nondet_u32(), "Nondet for u32" }
 nondet_impl! { i32, cvt::CVT_nondet_i32(), "Nondet for i32" }
 nondet_impl! { u64, cvt::CVT_nondet_u64(), "Nondet for u64" }

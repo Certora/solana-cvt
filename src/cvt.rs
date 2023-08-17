@@ -28,6 +28,12 @@ pub fn CVT_nondet_u8() ->  u8 {
 
 #[inline(never)]
 #[allow(non_snake_case)]
+pub fn CVT_nondet_u16() ->  u16 {
+    cvt_stubs::CVT_nondet_u16_impl()
+}
+
+#[inline(never)]
+#[allow(non_snake_case)]
 pub fn CVT_nondet_u32() ->  u32 {
     cvt_stubs::CVT_nondet_u32_impl()
 }
@@ -48,6 +54,12 @@ pub fn CVT_nondet_usize() ->  usize {
 #[allow(non_snake_case)]
 pub fn CVT_nondet_i8() ->  i8 {
     cvt_stubs::CVT_nondet_i8_impl()
+}
+
+#[inline(never)]
+#[allow(non_snake_case)]
+pub fn CVT_nondet_i16() ->  i16 {
+    cvt_stubs::CVT_nondet_i16_impl()
 }
 
 #[inline(never)]

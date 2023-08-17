@@ -23,38 +23,50 @@ pub fn CVT_nondet_u8_impl() ->  u8 {
 }
 
 #[allow(non_snake_case)]
-pub fn CVT_nondet_u32_impl() ->  u32 {
+pub fn CVT_nondet_u16_impl() ->  u16 {
     println!("you should never see this 4!");
     return 0;
 }
 
 #[allow(non_snake_case)]
-pub fn CVT_nondet_u64_impl() ->  u64 {
+pub fn CVT_nondet_u32_impl() ->  u32 {
     println!("you should never see this 5!");
     return 0;
 }
 
 #[allow(non_snake_case)]
-pub fn CVT_nondet_i8_impl() ->  i8 {
+pub fn CVT_nondet_u64_impl() ->  u64 {
     println!("you should never see this 6!");
     return 0;
 }
 
 #[allow(non_snake_case)]
-pub fn CVT_nondet_i32_impl() -> i32 {
+pub fn CVT_nondet_i8_impl() ->  i8 {
     println!("you should never see this 7!");
     return 0;
 }
 
 #[allow(non_snake_case)]
-pub fn CVT_nondet_i64_impl() ->  i64 {
+pub fn CVT_nondet_i16_impl() ->  i16 {
     println!("you should never see this 8!");
     return 0;
 }
 
 #[allow(non_snake_case)]
-pub fn CVT_nondet_usize_impl() ->  usize {
+pub fn CVT_nondet_i32_impl() -> i32 {
     println!("you should never see this 9!");
+    return 0;
+}
+
+#[allow(non_snake_case)]
+pub fn CVT_nondet_i64_impl() ->  i64 {
+    println!("you should never see this 10!");
+    return 0;
+}
+
+#[allow(non_snake_case)]
+pub fn CVT_nondet_usize_impl() ->  usize {
+    println!("you should never see this 11!");
     return 0;
 }
 
