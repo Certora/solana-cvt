@@ -1,14 +1,17 @@
 [package]
 name = "cvt"
 version = "1.0.0"
-description = "CVT verification functions"
+description = "Certora verification library"
 authors = ["Jorge Navas (jorge@certora.com)"]
 license = "Apache-2.0"
 edition = "2021"
 
 [dependencies]
 solana-program = "1.14.10"
-anchor-lang = "0.26.0" 
+anchor-lang = "0.27.0"
+
+[features]
+certora-debug = []
 
 [lib]
 crate-type = ["cdylib", "lib"]

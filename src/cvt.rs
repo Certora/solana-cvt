@@ -1,13 +1,5 @@
 use super::cvt_stubs;
 
-use std::collections::BTreeMap;
-use {
-    solana_program:: {
-        account_info::{AccountInfo},
-        pubkey::Pubkey
-    }
-};
-
 #[inline(never)]
 #[allow(non_snake_case)]
 pub fn CVT_assume(c: bool){
@@ -46,9 +38,7 @@ pub fn CVT_nondet_u64() ->  u64 {
 
 #[inline(never)]
 #[allow(non_snake_case)]
-pub fn CVT_nondet_usize() ->  usize {
-    cvt_stubs::CVT_nondet_usize_impl()
-}
+pub fn CVT_nondet_usize() ->  usize { cvt_stubs::CVT_nondet_usize_impl() }
 
 #[inline(never)]
 #[allow(non_snake_case)]
@@ -74,7 +64,6 @@ pub fn CVT_nondet_i64() ->  i64 {
     cvt_stubs::CVT_nondet_i64_impl()
 }
 
-
 #[inline(never)]
 #[allow(non_snake_case)]
 // Return an arbitrary usize but always the same one
@@ -82,27 +71,33 @@ pub fn CVT_uninterpreted_usize() ->  usize { cvt_stubs::CVT_uninterpreted_usize_
 
 #[inline(never)]
 #[allow(non_snake_case)]
-// TODO: use macro to allow arrays of different sizes without having a separate function per size
+// Return an array of 32 bytes initialized non-deterministically
 pub fn CVT_nondet_array_of_32_bytes() -> [u8; 32] {
-    cvt_stubs::CVT_nondet_pubkey_impl().to_bytes()
+    cvt_stubs::CVT_nondet_array_of_32_bytes_impl()
 }
 
-#[inline(never)]
-#[allow(non_snake_case)]
-pub fn CVT_nondet_btree_map() -> BTreeMap<String, u8> {
-    cvt_stubs::CVT_nondet_btree_map_impl()
+// We redefine these macros to avoid including error conversion/formatting code
+#[macro_export]
+macro_rules! require {
+    ($invariant:expr, $error:tt $(,)?) => {
+        cvt::CVT_assume($invariant);
+    };
+    ($invariant:expr, $error:expr $(,)?) => {
+        cvt::CVT_assume($invariant);
+    };
 }
 
-/* Stubs for solana_program */
-
-#[inline(never)]
-#[allow(non_snake_case)]
-pub fn CVT_nondet_account_info() -> AccountInfo<'static> {
-    cvt_stubs::CVT_nondet_account_info_impl()
+#[macro_export]
+macro_rules! require_gte {
+    ($value1: expr, $value2: expr, $error_code: expr $(,)?) => {
+        cvt::CVT_assume($value1 >= $value2);
+    };
+    ($value1: expr, $value2: expr $(,)?) => {
+        cvt::CVT_assume($value1 >= $value2);
+    };
 }
 
-#[inline(never)]
-#[allow(non_snake_case)]
-pub fn CVT_nondet_pubkey() -> Pubkey {
-    cvt_stubs::CVT_nondet_pubkey_impl()
+#[macro_export]
+macro_rules! assert {
+        ($cond:expr) => {{ cvt::CVT_assert($cond)}};
 }

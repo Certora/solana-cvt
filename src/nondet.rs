@@ -1,3 +1,5 @@
+use std::alloc::{alloc, Layout};
+
 /// A trait for giving a type a non-deterministic value
 pub trait Nondet: Sized {
     fn nondet() -> Self;
@@ -25,6 +27,20 @@ where
     Nondet::nondet_with(func)
 }
 
+/// The returned pointer is a raw pointer and we won't free it.
+/// That's okay since this function is only for verification purposes.
+/// That's why we alloc a raw pointer to avoid including all the ownership/reference counting
+/// stuff from Box and Rc
+pub fn nondet_pointer<T: Nondet>() -> *mut T {
+    unsafe {
+        let layout = Layout::new::<T>();
+        let ptr = alloc(layout) as *mut T;
+        crate::CVT_assume(!ptr.is_null());
+        *ptr = nondet();
+        ptr
+    }
+}
+
 macro_rules! nondet_impl {
     ($t:ty, $v:expr, $doc:tt) => {
         impl Nondet for $t {
@@ -36,6 +52,7 @@ macro_rules! nondet_impl {
         }
     };
 }
+
 pub(crate) use nondet_impl;
 
 use super::cvt;

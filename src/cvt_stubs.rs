@@ -1,78 +1,68 @@
-use std::collections::BTreeMap;
-use {
-    solana_program::{
-        account_info::{AccountInfo},
-        pubkey::Pubkey
-    }
-};
-
-#[allow(non_snake_case)]
-pub fn CVT_assume_impl(_c: bool){
-    println!("you should never see this 1!");
-}
-
-#[allow(non_snake_case)]
-pub fn CVT_assert_impl(_c: bool){
-    println!("you should never see this 2!");
-}
-
-#[allow(non_snake_case)]
-pub fn CVT_nondet_u8_impl() ->  u8 {
-    println!("you should never see this 3!");
-    return 0;
-}
-
-#[allow(non_snake_case)]
-pub fn CVT_nondet_u16_impl() ->  u16 {
-    println!("you should never see this 4!");
-    return 0;
-}
-
-#[allow(non_snake_case)]
-pub fn CVT_nondet_u32_impl() ->  u32 {
-    println!("you should never see this 5!");
-    return 0;
-}
-
-#[allow(non_snake_case)]
-pub fn CVT_nondet_u64_impl() ->  u64 {
-    println!("you should never see this 6!");
-    return 0;
-}
-
-#[allow(non_snake_case)]
-pub fn CVT_nondet_i8_impl() ->  i8 {
-    println!("you should never see this 7!");
-    return 0;
-}
-
-#[allow(non_snake_case)]
-pub fn CVT_nondet_i16_impl() ->  i16 {
-    println!("you should never see this 8!");
-    return 0;
-}
-
-#[allow(non_snake_case)]
-pub fn CVT_nondet_i32_impl() -> i32 {
-    println!("you should never see this 9!");
-    return 0;
-}
-
-#[allow(non_snake_case)]
-pub fn CVT_nondet_i64_impl() ->  i64 {
-    println!("you should never see this 10!");
-    return 0;
-}
-
-#[allow(non_snake_case)]
-pub fn CVT_nondet_usize_impl() ->  usize {
-    println!("you should never see this 11!");
-    return 0;
-}
-
 
 extern "C" {
+    fn CVT_assume_c(_c: bool);
+    fn CVT_assert_c(_c: bool);
+    
+    fn CVT_nondet_u8_c() ->  u8; 
+    fn CVT_nondet_u16_c() ->  u16; 
+    fn CVT_nondet_u32_c() ->  u32; 
+    fn CVT_nondet_u64_c() ->  u64;
+    fn CVT_nondet_usize_c() ->  usize;
+    
+    fn CVT_nondet_i8_c() ->  i8;
+    fn CVT_nondet_i16_c() ->  i16;
+    fn CVT_nondet_i32_c() -> i32;
+    fn CVT_nondet_i64_c() ->  i64;
+
+    // Rust: we cannot use type parameters on foreign items
+    // fn CVT_nondet_pointer_c<T: Nondet>() -> *mut T;
     fn CVT_nondet_pointer_usize() -> *mut usize;
+
+}
+
+#[allow(non_snake_case)]
+pub fn CVT_assume_impl(c: bool) {
+    unsafe { CVT_assume_c(c); }
+}
+#[allow(non_snake_case)]
+pub fn CVT_assert_impl(c: bool) {
+    unsafe { CVT_assert_c(c); }
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_u8_impl() ->  u8 {
+    unsafe { return CVT_nondet_u8_c(); }
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_u16_impl() ->  u16 {
+    unsafe { return CVT_nondet_u16_c(); }
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_u32_impl() ->  u32 {
+    unsafe { return CVT_nondet_u32_c(); }
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_u64_impl() ->  u64 {
+    unsafe { return CVT_nondet_u64_c(); }
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_usize_impl() ->  usize {
+    unsafe { return CVT_nondet_usize_c(); }
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_i8_impl() ->  i8 {
+    unsafe { return CVT_nondet_i8_c(); }
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_i16_impl() ->  i16 {
+    unsafe { return CVT_nondet_i16_c(); }
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_i32_impl() -> i32 {
+    unsafe { return CVT_nondet_i32_c(); } 
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_i64_impl() ->  i64 {
+    unsafe { return CVT_nondet_i64_c(); }
 }
 
 static mut CVT_UNINTERPRETED_USIZE: *mut usize = std::ptr::null_mut();
@@ -87,38 +77,24 @@ pub fn CVT_uninterpreted_usize_impl() ->  usize {
     }
 }
 
-extern "C" {
-    #[allow(improper_ctypes)]
-    fn mk_account_info_unchecked() -> AccountInfo<'static>;
-}
 
-#[allow(non_snake_case)]
-pub fn CVT_nondet_account_info_impl() -> AccountInfo<'static> {
-    unsafe {
-        return mk_account_info_unchecked();
+macro_rules! CVT_nondet_array_of_bytes {
+    ($name_impl:ident, $name_c: ident, $size:expr) => {
+	    extern "C" {
+	        fn $name_c() -> [u8; $size];
+	    }
+  	    #[allow(non_snake_case)]
+	    pub fn $name_impl() -> [u8; $size] {
+	        unsafe {
+		        return $name_c();
+	        }
+	    }
     }
 }
 
-extern "C" {
-    #[allow(improper_ctypes)]
-    fn mk_pubkey_unchecked() -> Pubkey;
-}
+CVT_nondet_array_of_bytes!(CVT_nondet_array_of_32_bytes_impl,
+                           CVT_nondet_array_of_32_bytes_c,
+                           32);
 
-#[allow(non_snake_case)]
-pub fn CVT_nondet_pubkey_impl() -> Pubkey {
-    unsafe {
-        return mk_pubkey_unchecked();
-    }
-}
 
-extern "C" {
-    #[allow(improper_ctypes)]
-    fn mk_btree_map_unchecked() -> BTreeMap<String, u8>;
-}
 
-#[allow(non_snake_case)]
-pub fn CVT_nondet_btree_map_impl() -> BTreeMap<String, u8> {
-    unsafe {
-        return mk_btree_map_unchecked()
-    }
-}
