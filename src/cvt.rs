@@ -71,10 +71,27 @@ pub fn CVT_nondet_i64() ->  i64 {
     cvt_stubs::CVT_nondet_i64_impl()
 }
 
-#[inline(never)]
-#[allow(non_snake_case)]
-// Return an arbitrary usize but always the same one
-pub fn CVT_uninterpreted_usize() ->  usize { cvt_stubs::CVT_uninterpreted_usize_impl()}
+extern "C" {
+    // Rust: we cannot use type parameters on foreign items
+    // fn CVT_nondet_pointer_c<T: Nondet>() -> *mut T;
+    pub fn CVT_nondet_pointer_usize() -> *mut usize;
+}
+
+#[macro_export]
+macro_rules! cvt_uninterpreted_usize {
+    ($fname:ident, $gname: ident) => {
+        static mut $gname: *mut usize = std::ptr::null_mut();
+        #[allow(non_snake_case)]
+        pub fn $fname() ->  usize {
+            unsafe {
+                if $gname.is_null() {
+                    $gname = cvt::CVT_nondet_pointer_usize()
+                }
+                *$gname
+             }
+        }
+    };
+}
 
 #[inline(never)]
 #[allow(non_snake_case)]

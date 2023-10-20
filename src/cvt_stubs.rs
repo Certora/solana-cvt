@@ -13,11 +13,6 @@ extern "C" {
     fn CVT_nondet_i16_c() ->  i16;
     fn CVT_nondet_i32_c() -> i32;
     fn CVT_nondet_i64_c() ->  i64;
-
-    // Rust: we cannot use type parameters on foreign items
-    // fn CVT_nondet_pointer_c<T: Nondet>() -> *mut T;
-    fn CVT_nondet_pointer_usize() -> *mut usize;
-
 }
 
 #[allow(non_snake_case)]
@@ -63,18 +58,6 @@ pub fn CVT_nondet_i32_impl() -> i32 {
 #[allow(non_snake_case)]
 pub fn CVT_nondet_i64_impl() ->  i64 {
     unsafe { return CVT_nondet_i64_c(); }
-}
-
-static mut CVT_UNINTERPRETED_USIZE: *mut usize = std::ptr::null_mut();
-
-#[allow(non_snake_case)]
-pub fn CVT_uninterpreted_usize_impl() ->  usize {
-    unsafe {
-        if CVT_UNINTERPRETED_USIZE.is_null() {
-            CVT_UNINTERPRETED_USIZE = CVT_nondet_pointer_usize()
-        }
-        *CVT_UNINTERPRETED_USIZE
-    }
 }
 
 
