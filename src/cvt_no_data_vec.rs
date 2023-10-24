@@ -22,8 +22,15 @@ const DEFAULT_CAPACITY: usize = 1073741824;
 const MAX_MALLOC_SIZE: usize = 18014398509481984;
 
 macro_rules! assert {
-        ($cond:expr) => {{ /*cvt::CVT_assert($cond)*/}};
+    ($cond:expr) => {{ /*cvt::CVT_assert($cond)*/}};
 }
+
+// We have observed that resizing might cause collapses in the pointer analysis.
+// So we have this macro to enable/disable resizing.
+macro_rules! allow_resizing {
+    () => { false }
+}
+
 
 // The NoDataVec structure here models the length and the capacity.
 pub struct NoDataVec<T> {
@@ -99,9 +106,12 @@ impl<T: Nondet> NoDataVec<T> {
 
     #[cfg_attr(feature = "certora-debug", inline(never))]
     pub fn push(&mut self, _elem: T) {
-        // Please refer to grow() for better understanding the semantics of reserve().
-        if self.capacity == self.len {
-            self.reserve(1);
+
+        if allow_resizing!() {
+            // Please refer to grow() for better understanding the semantics of reserve().
+            if self.capacity == self.len {
+                self.reserve(1);
+            }
         }
 
         assert!(self.capacity >= self.len);
@@ -126,9 +136,12 @@ impl<T: Nondet> NoDataVec<T> {
     #[cfg_attr(feature = "certora-debug", inline(never))]
     pub fn append(&mut self, other: &mut NoDataVec<T>) {
         let new_len = self.len + other.len;
-        // Please refer to grow() for better understanding the semantics of grow().
-        if self.capacity < new_len {
-            self.reserve(other.len);
+
+        if allow_resizing!() {
+            // Please refer to grow() for better understanding the semantics of grow().
+            if self.capacity < new_len {
+                self.reserve(other.len);
+            }
         }
 
         assert!(self.capacity >= new_len);
