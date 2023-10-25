@@ -1,3 +1,5 @@
+#![cfg(feature="include-anchor")]
+
 use { 
     solana_program::account_info::AccountInfo,
     anchor_lang::prelude::{

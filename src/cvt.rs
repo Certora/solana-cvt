@@ -84,6 +84,7 @@ macro_rules! cvt_deterministic_usize {
     ($fname:ident, $gname: ident) => {
         static mut $gname: *mut usize = std::ptr::null_mut();
         #[allow(non_snake_case)]
+	/// Returns an arbitrary usize but always the same
         pub fn $fname() ->  usize {
             unsafe {
                 if $gname.is_null() {
