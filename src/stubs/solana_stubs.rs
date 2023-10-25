@@ -9,7 +9,7 @@ extern "C" {
     #[allow(improper_ctypes)]
     fn mk_account_info_unchecked() -> AccountInfo<'static>;
     #[allow(improper_ctypes)]
-    fn mk_pubkey_unchecked() -> Pubkey;    
+    fn mk_pubkey_unchecked() -> Pubkey;
 }
 
 #[allow(non_snake_case)]

@@ -1,4 +1,3 @@
-
 extern crate alloc;
 use alloc::alloc::{Layout, alloc, dealloc, handle_alloc_error};
 use core::mem;

@@ -1,11 +1,4 @@
 use std::collections::BTreeMap;
-use {
-    crate::{
-        nondet::{
-            Nondet, nondet_impl
-        }
-    }
-};
 
 extern "C" {
     #[allow(improper_ctypes)]
@@ -24,5 +17,3 @@ fn CVT_nondet_btree_map_impl() -> BTreeMap<String, u8> {
 pub fn CVT_nondet_btree_map() -> BTreeMap<String, u8> {
     CVT_nondet_btree_map_impl()
 }
-
-nondet_impl! {BTreeMap<String, u8>, CVT_nondet_btree_map(), "Nondet for BTreeMap<String, u8>" }

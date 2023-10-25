@@ -1,4 +1,5 @@
-use super::cvt_stubs;
+
+use crate::stubs::{cvt_stubs};
 
 #[inline(never)]
 #[allow(non_snake_case)]
@@ -78,7 +79,8 @@ extern "C" {
 }
 
 #[macro_export]
-macro_rules! cvt_uninterpreted_usize {
+/// Returns an arbitrary usize but always the same
+macro_rules! cvt_deterministic_usize {
     ($fname:ident, $gname: ident) => {
         static mut $gname: *mut usize = std::ptr::null_mut();
         #[allow(non_snake_case)]
@@ -95,12 +97,12 @@ macro_rules! cvt_uninterpreted_usize {
 
 #[inline(never)]
 #[allow(non_snake_case)]
-// Return an array of 32 bytes initialized non-deterministically
+/// Return an array of 32 bytes initialized non-deterministically
 pub fn CVT_nondet_array_of_32_bytes() -> [u8; 32] {
     cvt_stubs::CVT_nondet_array_of_32_bytes_impl()
 }
 
-// We redefine these macros to avoid including error conversion/formatting code
+/// We redefine these macros to avoid including error conversion/formatting code
 #[macro_export]
 macro_rules! require {
     ($invariant:expr, $error:tt $(,)?) => {

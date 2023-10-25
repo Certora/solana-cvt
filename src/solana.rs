@@ -1,7 +1,5 @@
 /* Stubs for solana_program */
 
-use super::solana_stubs;
-
 use {
     solana_program::{
         account_info::AccountInfo,
@@ -10,7 +8,8 @@ use {
     crate::{
         nondet::{
             Nondet, nondet_impl,
-        }
+        },
+        stubs:: { solana_stubs }
     }
 };
 

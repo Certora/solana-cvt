@@ -1,4 +1,3 @@
-
 extern "C" {
     fn CVT_assume_c(_c: bool);
     fn CVT_assert_c(_c: bool);
@@ -63,6 +62,8 @@ pub fn CVT_nondet_i64_impl() ->  i64 {
 
 macro_rules! CVT_nondet_array_of_bytes {
     ($name_impl:ident, $name_c: ident, $size:expr) => {
+        #[allow(improper_ctypes)]
+        #[allow(non_snake_case)]
 	    extern "C" {
 	        fn $name_c() -> [u8; $size];
 	    }
@@ -74,6 +75,7 @@ macro_rules! CVT_nondet_array_of_bytes {
 	    }
     }
 }
+
 
 CVT_nondet_array_of_bytes!(CVT_nondet_array_of_32_bytes_impl,
                            CVT_nondet_array_of_32_bytes_c,
