@@ -54,10 +54,7 @@ macro_rules! nondet_impl {
 }
 
 pub(crate) use nondet_impl;
-
 use super::cvt;
-use crate::stubs::std_stubs::CVT_nondet_btree_map;
-use std::collections::BTreeMap;
 
 nondet_impl! { (), (),  "No nondet value for  unit" }
 nondet_impl! { u8, cvt::CVT_nondet_u8(), "Nondet for u8" }
@@ -71,4 +68,3 @@ nondet_impl! { i64, cvt::CVT_nondet_i64(), "Nondet for i64" }
 nondet_impl! { usize, cvt::CVT_nondet_usize(), "Nondet for usize" }
 
 nondet_impl! { [u8; 32], cvt::CVT_nondet_array_of_32_bytes(), "Nondet for 32-byte array" }
-nondet_impl! { BTreeMap<String, u8>, CVT_nondet_btree_map(), "Nondet for BTreeMap<String, u8>" }
