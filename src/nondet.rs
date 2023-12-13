@@ -3,6 +3,9 @@ use std::alloc::{alloc, Layout};
 /// A trait for giving a type a non-deterministic value
 pub trait Nondet: Sized {
     fn nondet() -> Self;
+    fn nondet_ref() -> &'static mut Self {
+        Box::leak(Box::new(Self::nondet()))
+    }
 
     /// i32::nondet_with(|x| x > 0)
     fn nondet_with<F>(func: F) -> Self
@@ -18,6 +21,10 @@ pub trait Nondet: Sized {
 /// Return a nondet value of type according tot the Nondet trait
 pub fn nondet<T: Nondet>() -> T {
     Nondet::nondet()
+}
+
+pub fn nondet_ref<T: Nondet>() -> &'static mut T {
+    Nondet::nondet_ref()
 }
 
 pub fn nondet_with<T: Nondet, F>(func: F) -> T
