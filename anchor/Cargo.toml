@@ -1,0 +1,15 @@
+[package]
+name = "anchor"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anchor-lang = { version = "0.29.0", optional = true}
+borsh = "0.10"
+containers = { path = "../containers" }
+cvt_core = { path = "../cvt_core" }
+
+[features]
+include-anchor = ["dep:anchor-lang"]

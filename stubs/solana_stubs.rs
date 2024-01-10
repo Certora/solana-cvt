@@ -1,9 +1,7 @@
-use {
-    solana_program::{
+use solana_program::{
         account_info::AccountInfo,
         pubkey::Pubkey
-    }
-};
+    };
 
 extern "C" {
     #[allow(improper_ctypes)]

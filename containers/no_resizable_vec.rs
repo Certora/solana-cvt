@@ -4,7 +4,7 @@ use core::mem;
 use core::ops::{Deref, DerefMut, Index, IndexMut, Range};
 use core::ptr::{self, NonNull};
 use std::cmp::Ordering;
-use crate::{CVT_assume};
+use cvt_core::CVT_assume;
 
 ////////////////////////////////////////////////////////////////////////
 // Adapted from SeaHorn.

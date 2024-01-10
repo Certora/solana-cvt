@@ -1,0 +1,18 @@
+[package]
+name = "containers"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cvt_core = { path = "../cvt_core" }
+nondet = { path = "../nondet" }
+
+[features]
+certora-debug = []
+
+[lib]
+crate-type = ["cdylib", "lib"]
+path = "mod.rs"
+name = "containers"

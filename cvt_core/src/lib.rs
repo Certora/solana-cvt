@@ -1,5 +1,5 @@
 
-use crate::stubs::{cvt_stubs};
+use stubs::cvt_stubs;
 
 #[inline(never)]
 #[allow(non_snake_case)]
@@ -88,7 +88,7 @@ macro_rules! cvt_deterministic_usize {
         pub fn $fname() ->  usize {
             unsafe {
                 if $gname.is_null() {
-                    $gname = cvt::CVT_nondet_pointer_usize()
+                    $gname = cvt_core::CVT_nondet_pointer_usize()
                 }
                 *$gname
              }
@@ -107,44 +107,44 @@ pub fn CVT_nondet_array_of_32_bytes() -> [u8; 32] {
 #[macro_export]
 macro_rules! require {
     ($invariant:expr, $error:tt $(,)?) => {
-        cvt::CVT_assume($invariant);
+        cvt_core::CVT_assume($invariant);
     };
     ($invariant:expr, $error:expr $(,)?) => {
-        cvt::CVT_assume($invariant);
+        cvt_core::CVT_assume($invariant);
     };
 }
 
 #[macro_export]
 macro_rules! require_gte {
     ($value1: expr, $value2: expr, $error_code: expr $(,)?) => {
-        cvt::CVT_assume($value1 >= $value2);
+        cvt_core::CVT_assume($value1 >= $value2);
     };
     ($value1: expr, $value2: expr $(,)?) => {
-        cvt::CVT_assume($value1 >= $value2);
+        cvt_core::CVT_assume($value1 >= $value2);
     };
 }
 
 #[macro_export]
 macro_rules! require_eq {
     ($value1: expr, $value2: expr, $error_code: expr $(,)?) => {
-        cvt::CVT_assume($value1 == $value2);
+        cvt_core::CVT_assume($value1 == $value2);
     };
     ($value1: expr, $value2: expr $(,)?) => {
-        cvt::CVT_assume($value1 == $value2);
+        cvt_core::CVT_assume($value1 == $value2);
     };
 }
 
 #[macro_export]
 macro_rules! require_neq {
     ($value1: expr, $value2: expr, $error_code: expr $(,)?) => {
-        cvt::CVT_assume($value1 != $value2);
+        cvt_core::CVT_assume($value1 != $value2);
     };
     ($value1: expr, $value2: expr $(,)?) => {
-        cvt::CVT_assume($value1 != $value2);
+        cvt_core::CVT_assume($value1 != $value2);
     };
 }
 
 #[macro_export]
 macro_rules! assert {
-        ($cond:expr) => {{ cvt::CVT_assert($cond)}};
+        ($cond:expr) => {{ cvt_core::CVT_assert($cond)}};
 }

@@ -3,16 +3,15 @@
 use std::io::Read;
 use {
     borsh::{BorshDeserialize, BorshSerialize},
-    crate::{
-        nondet::{
-            Nondet
-        }
-    },
+    nondet::Nondet
 };
 
-use crate::{CVT_nondet_usize, NoDataVec, NoResizableVec};
 use anchor_lang::prelude::borsh::maybestd::io::Write;
 use anchor_lang::prelude::*;
+
+use containers::no_data_vec::NoDataVec;
+use containers::no_resizable_vec::NoResizableVec;
+use cvt_core::CVT_nondet_usize;
 
 impl<T> BorshSerialize for NoDataVec<T> {
     fn serialize<W: Write>(&self, _writer: &mut W) -> borsh::maybestd::io::Result<()> {
