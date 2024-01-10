@@ -4,7 +4,11 @@ use core::mem;
 use core::ops::{Deref, DerefMut, Index, IndexMut, Range};
 use core::ptr::{self, NonNull};
 use std::cmp::Ordering;
-use crate::{CVT_assume};
+use cvt::CVT_assume;
+use nondet::Nondet;
+use std::io::Read;
+use anchor_lang::prelude::borsh::maybestd::io::Write;
+use borsh::{BorshDeserialize, BorshSerialize};
 
 ////////////////////////////////////////////////////////////////////////
 // Adapted from SeaHorn.
@@ -396,7 +400,7 @@ macro_rules! cvt_no_resizable_vec {
    ($($values:expr),+ $(,)?) => (
         {
             let ARG_COUNT: usize = 0 $(+ { _ = $values; 1 })*;
-            let mut v = cvt::NoResizableVec::new(ARG_COUNT*2);
+            let mut v = vectors::no_resizable_vec::NoResizableVec::new(ARG_COUNT*2);
             $(v.push($values);)*
             v
         }
@@ -407,7 +411,7 @@ macro_rules! cvt_no_resizable_vec {
         {
             let ARG_COUNT: usize = 0 $(+ { _ = $values; 1 })*;
             assert!(ARG_COUNT <= $cap);
-            let mut v = cvt::NoResizableVec::new($cap);
+            let mut v = vectors::no_resizable_vec::NoResizableVec::new($cap);
             $(v.push($values);)*
             v
         }
@@ -415,4 +419,25 @@ macro_rules! cvt_no_resizable_vec {
 }
 
 
+// Implement the Borsh serialization/deserialization traits for NoResizableVec.
+
+impl<T> BorshSerialize for NoResizableVec<T> {
+    fn serialize<W: Write>(&self, _writer: &mut W) -> borsh::maybestd::io::Result<()> {
+        Ok(())
+    }
+}
+
+/// We need to fix the capacity of the vector.
+/// However, this number depends on the specific verification task.
+impl<T:Nondet> BorshDeserialize for NoResizableVec<T> {
+    fn deserialize(_buf: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
+        let res = NoResizableVec::new(10) ;
+        Ok(res)
+    }
+
+    fn deserialize_reader<R: Read>(_reader: &mut R) -> std::io::Result<Self> {
+        let res = NoResizableVec::new(10) ;
+        Ok(res)
+    }
+}
 

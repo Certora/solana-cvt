@@ -1,5 +1,5 @@
 
-use crate::stubs::{cvt_stubs};
+use stubs::cvt_stubs;
 
 #[inline(never)]
 #[allow(non_snake_case)]
