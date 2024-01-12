@@ -13,6 +13,6 @@ nondet = { path = "../nondet" }
 certora-debug = []
 
 [lib]
-crate-type = ["cdylib", "lib"]
+crate-type = ["lib"]
 path = "mod.rs"
 name = "containers"

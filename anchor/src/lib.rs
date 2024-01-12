@@ -7,7 +7,6 @@ use {
 };
 
 use anchor_lang::prelude::borsh::maybestd::io::Write;
-use anchor_lang::prelude::*;
 
 use containers::no_data_vec::NoDataVec;
 use containers::no_resizable_vec::NoResizableVec;

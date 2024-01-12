@@ -11,3 +11,6 @@ proc-macro = true
 [dependencies]
 syn = "1.0.109"
 quote = "1.0"
+macrotest = "1"
+trybuild = "1.0.31"
+

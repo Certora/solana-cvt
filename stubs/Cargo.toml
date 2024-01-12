@@ -9,6 +9,6 @@ edition = "2021"
 solana-program = "1.14.10"
 
 [lib]
-crate-type = ["cdylib", "lib"]
+crate-type = ["lib"]
 path = "mod.rs"
 name = "stubs"
