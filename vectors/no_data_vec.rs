@@ -3,7 +3,7 @@ use std::ops::Index;
 use nondet::{
         Nondet, nondet, nondet_pointer
     };
-use cvt_core::CVT_assume;
+use cvt::CVT_assume;
 
 ////////////////////////////////////////////////////////////////////////
 // Adapted from Kani.

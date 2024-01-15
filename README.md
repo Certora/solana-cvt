@@ -5,10 +5,10 @@ programs to create non-deterministic environments, assume/assert, and
 alternative (simpler but complete) implementations for std containers such as `Vec` class.
 
 It includes the following crates:
-- `anchor` [TODO: description]
-- `containers` [TODO: description]
-- `cvt_core` [TODO: description]
+- `anchor-nd` [TODO: description]
+- `vectors` [TODO: description]
+- `cvt` [TODO: description]
 - `hook_macro` - Defines macros for inserting hooks at the beginning and end of functions.
 - `nondet` [TODO: description]
-- `solana` [TODO: description]
+- `solana-nd` [TODO: description]
 - `stubs` [TODO: description]

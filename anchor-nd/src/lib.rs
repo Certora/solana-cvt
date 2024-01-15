@@ -8,9 +8,9 @@ use {
 
 use anchor_lang::prelude::borsh::maybestd::io::Write;
 
-use containers::no_data_vec::NoDataVec;
-use containers::no_resizable_vec::NoResizableVec;
-use cvt_core::CVT_nondet_usize;
+use vectors::no_data_vec::NoDataVec;
+use vectors::no_resizable_vec::NoResizableVec;
+use cvt::CVT_nondet_usize;
 
 impl<T> BorshSerialize for NoDataVec<T> {
     fn serialize<W: Write>(&self, _writer: &mut W) -> borsh::maybestd::io::Result<()> {

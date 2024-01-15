@@ -1,12 +1,12 @@
 [package]
-name = "containers"
+name = "vectors"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cvt_core = { path = "../cvt_core" }
+cvt = { path = "../cvt" }
 nondet = { path = "../nondet" }
 
 [features]
@@ -15,4 +15,4 @@ certora-debug = []
 [lib]
 crate-type = ["lib"]
 path = "mod.rs"
-name = "containers"
+name = "vectors"

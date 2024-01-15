@@ -1,5 +1,5 @@
 use std::alloc::{alloc, Layout};
-use cvt_core::CVT_assume;
+use cvt::CVT_assume;
 
 /// A trait for giving a type a non-deterministic value
 pub trait Nondet: Sized {
@@ -63,7 +63,7 @@ macro_rules! nondet_impl {
     };
 }
 
-use cvt_core as cvt;
+use cvt;
 use solana_program::{
     account_info::AccountInfo,
     pubkey::Pubkey

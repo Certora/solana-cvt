@@ -1,5 +1,5 @@
 
-use cvt_core::CVT_assume;
+use cvt::CVT_assume;
 
 // We redefine this macro to avoid including error code conversion/formatting
 #[macro_export]

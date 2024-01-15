@@ -1,10 +1,10 @@
 [workspace]
 members = [ 
-    "anchor", 
-    "containers", 
-    "cvt_core", 
+    "anchor-nd", 
+    "vectors", 
+    "cvt", 
     "hook_macro",
     "nondet", 
-    "solana",
+    "solana-nd",
     "stubs"
 ]
