@@ -1,6 +1,4 @@
 
-use cvt::CVT_assume;
-
 // We redefine this macro to avoid including error code conversion/formatting
 #[macro_export]
 macro_rules! require_keys_eq {

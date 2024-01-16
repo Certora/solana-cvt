@@ -97,7 +97,7 @@ nondet_impl! { usize, cvt::CVT_nondet_usize(), "Nondet for usize" }
 
 nondet_impl! { [u8; 32], cvt::CVT_nondet_array_of_32_bytes(), "Nondet for 32-byte array" }
 
-// need to implenet Nondet for Pubkey and AccountInfo here instead of solana/src/lib.rs
+// E0117: need to implenet Nondet for Pubkey and AccountInfo here instead of solana/src/lib.rs
 // because we can only implement a trait for an arbitrary type in the crate where the trait is defined
 nondet_impl! {Pubkey, CVT_nondet_pubkey(), "Nondet for Pubkey" }
 nondet_impl! {AccountInfo<'static>, CVT_nondet_account_info(), "Nondet for AccountInfo" }
