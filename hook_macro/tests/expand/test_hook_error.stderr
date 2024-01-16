@@ -1,7 +1,5 @@
-error: custom attribute panicked
- --> tests/expand/test_hook_error.rs:9:1
-  |
-9 | #[cvt_hook_start(hook())]
-  | ^^^^^^^^^^^^^^^^^^^^^^^^^
-  |
-  = help: message: Expected hook to be applied to a function
+error: expected `fn`
+  --> tests/expand/test_hook_error.rs:10:1
+   |
+10 | struct S1 {
+   | ^^^^^^

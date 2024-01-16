@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, AttributeArgs};
+use syn::{parse_macro_input, AttributeArgs, ItemFn};
 use quote::ToTokens;
 
 
@@ -26,25 +26,22 @@ pub fn cvt_hook_start(attr: TokenStream, input: TokenStream) -> TokenStream {
     // parse the attribute argument
     let attr = parse_macro_input!(attr as AttributeArgs);
     if attr.len() != 1 {
-        panic!("Expected 1 argument");
+        return quote! {
+            compile_error!("Expected 1 argument");
+        }.into();
     }
 
     let arg = &attr[0]; 
 
     // parse the input tokens and make sure it is a function
-    let mut item: syn::Item = syn::parse(input).unwrap();
-    let fn_item = match &mut item {
-        syn::Item::Fn(fn_item) => fn_item,
-        _ => panic!("Expected hook to be applied to a function")
-    };
-
+    let mut fn_item = parse_macro_input!(input as ItemFn);
 
     // insert tokens_start into fn item statements at position 0
     let tokens_start = quote! { #arg; };
 
     fn_item.block.stmts.insert(0,syn::parse(tokens_start.into()).unwrap());
 
-    item.into_token_stream().into()
+    fn_item.into_token_stream().into()
 }
 
 
@@ -76,17 +73,15 @@ pub fn cvt_hook_end(attr: TokenStream, input: TokenStream) -> TokenStream {
     // parse the attribute argument
     let attr = parse_macro_input!(attr as AttributeArgs);
     if attr.len() != 1 {
-        panic!("Expected 1 argument");
+        return quote! {
+            compile_error!("Expected 1 argument");
+        }.into();
     }
 
     let arg = &attr[0]; 
 
     // parse the input tokens and make sure it is a function
-    let mut item: syn::Item = syn::parse(input).unwrap();
-    let fn_item = match &mut item {
-        syn::Item::Fn(fn_item) => fn_item,
-        _ => panic!("Expected hook to be applied to a function")
-    };
+    let mut fn_item = parse_macro_input!(input as ItemFn);
 
     // create tokens_end
     let tokens_end = quote! { #arg; };
@@ -97,5 +92,5 @@ pub fn cvt_hook_end(attr: TokenStream, input: TokenStream) -> TokenStream {
     // insert tokens_end into fn item statements at position len-1
     fn_item.block.stmts.insert(len-1,syn::parse(tokens_end.into()).unwrap());
     
-    item.into_token_stream().into()
+    fn_item.into_token_stream().into()
 }
