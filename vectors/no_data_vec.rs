@@ -3,7 +3,7 @@ use std::ops::Index;
 use nondet::{
         Nondet, nondet, nondet_pointer
     };
-use cvt::CVT_assume;
+use cvt::{ CVT_assume, CVT_nondet_usize };
 
 ////////////////////////////////////////////////////////////////////////
 // Adapted from Kani.
@@ -347,4 +347,29 @@ macro_rules! cvt_no_data_vec {
     }
   };
 }
+
+// Implement the Borsh serialization/deserialization traits for NoDataVec.
+
+use std::io::Read;
+use anchor_lang::prelude::borsh::maybestd::io::Write;
+use borsh::{BorshDeserialize, BorshSerialize};
+
+impl<T> BorshSerialize for NoDataVec<T> {
+    fn serialize<W: Write>(&self, _writer: &mut W) -> borsh::maybestd::io::Result<()> {
+        Ok(())
+    }
+}
+
+impl<T:Nondet> BorshDeserialize for NoDataVec<T> {
+    fn deserialize(_buf: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
+        let res = NoDataVec::with_len(CVT_nondet_usize()) ;
+        Ok(res)
+    }
+
+    fn deserialize_reader<R: Read>(_reader: &mut R) -> std::io::Result<Self> {
+        let res = NoDataVec::with_len(CVT_nondet_usize()) ;
+        Ok(res)
+    }
+}
+
 

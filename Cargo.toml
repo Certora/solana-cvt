@@ -1,6 +1,5 @@
 [workspace]
 members = [ 
-    "anchor-nd", 
     "vectors", 
     "cvt", 
     "hook_macro",
