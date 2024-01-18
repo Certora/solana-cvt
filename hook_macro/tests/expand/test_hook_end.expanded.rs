@@ -16,7 +16,6 @@ fn t1() {
             }
         }
     };
-    hook();
     match (&2, &2) {
         (left_val, right_val) => {
             if !(*left_val == *right_val) {
@@ -30,9 +29,9 @@ fn t1() {
             }
         }
     };
+    hook();
 }
 fn t2() {
-    hook();
     match (&1, &1) {
         (left_val, right_val) => {
             if !(*left_val == *right_val) {
@@ -46,4 +45,5 @@ fn t2() {
             }
         }
     };
+    hook();
 }

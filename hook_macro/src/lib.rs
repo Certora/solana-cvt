@@ -49,25 +49,22 @@ pub fn cvt_hook_start(attr: TokenStream, input: TokenStream) -> TokenStream {
 
 /**
  * This macro is used to insert a hook at the end of a function.
+ * If the function returns a value, the hook is inserted before the return statement.
  * # Example
  * #[cvt_hook_end(hook())]
     fn t1() {
         assert_eq!(1, 1);
-        // hook inserted here
         assert_eq!(2, 2);
+        // hook inserted here
     }
 
     expands to 
 
     fn t1() {
         assert_eq!(1, 1);
-        hook();
         assert_eq!(2, 2);
+        hook()
     }
-
-    Note: if the function contains only one statement,
-    cvt_hook_start and cvt_hook_end are equivalent.
-
  */
 #[proc_macro_attribute]
 pub fn cvt_hook_end(attr: TokenStream, input: TokenStream) -> TokenStream {
@@ -84,6 +81,7 @@ pub fn cvt_hook_end(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     // parse the input tokens and make sure it is a function
     let mut fn_item = parse_macro_input!(input as ItemFn);
+    let ret_type = &fn_item.sig.output;
 
     // create tokens_end
     let tokens_end = quote! { #arg; };
@@ -91,8 +89,16 @@ pub fn cvt_hook_end(attr: TokenStream, input: TokenStream) -> TokenStream {
     // len of fn item statements
     let len = fn_item.block.stmts.len();
 
-    // insert tokens_end into fn item statements at position len-1
-    fn_item.block.stmts.insert(len-1,syn::parse(tokens_end.into()).unwrap());
+    match ret_type {
+        syn::ReturnType::Default => {
+            // insert tokens_end into fn item statements at position len
+            fn_item.block.stmts.insert(len,syn::parse(tokens_end.into()).unwrap());
+        },
+        syn::ReturnType::Type(_,_) => {
+            // insert tokens_end into fn item statements at position len-1
+            fn_item.block.stmts.insert(len-1,syn::parse(tokens_end.into()).unwrap());
+        }
+    }
     
     fn_item.into_token_stream().into()
 }
