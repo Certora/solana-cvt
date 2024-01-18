@@ -4,6 +4,6 @@ members = [
     "cvt", 
     "hook_macro",
     "nondet", 
-    "solana-nd",
+    "solana_nd",
     "stubs"
 ]

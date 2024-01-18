@@ -5,6 +5,10 @@ use nondet::{
     };
 use cvt::{ CVT_assume, CVT_nondet_usize };
 
+use std::io::Read;
+use anchor_lang::prelude::borsh::maybestd::io::Write;
+use borsh::{BorshDeserialize, BorshSerialize};
+
 ////////////////////////////////////////////////////////////////////////
 // Adapted from Kani.
 
@@ -349,10 +353,6 @@ macro_rules! cvt_no_data_vec {
 }
 
 // Implement the Borsh serialization/deserialization traits for NoDataVec.
-
-use std::io::Read;
-use anchor_lang::prelude::borsh::maybestd::io::Write;
-use borsh::{BorshDeserialize, BorshSerialize};
 
 impl<T> BorshSerialize for NoDataVec<T> {
     fn serialize<W: Write>(&self, _writer: &mut W) -> borsh::maybestd::io::Result<()> {

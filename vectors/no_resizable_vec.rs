@@ -6,6 +6,9 @@ use core::ptr::{self, NonNull};
 use std::cmp::Ordering;
 use cvt::CVT_assume;
 use nondet::Nondet;
+use std::io::Read;
+use anchor_lang::prelude::borsh::maybestd::io::Write;
+use borsh::{BorshDeserialize, BorshSerialize};
 
 ////////////////////////////////////////////////////////////////////////
 // Adapted from SeaHorn.
@@ -397,7 +400,7 @@ macro_rules! cvt_no_resizable_vec {
    ($($values:expr),+ $(,)?) => (
         {
             let ARG_COUNT: usize = 0 $(+ { _ = $values; 1 })*;
-            let mut v = cvt::NoResizableVec::new(ARG_COUNT*2);
+            let mut v = vectors::no_resizable_vec::NoResizableVec::new(ARG_COUNT*2);
             $(v.push($values);)*
             v
         }
@@ -408,7 +411,7 @@ macro_rules! cvt_no_resizable_vec {
         {
             let ARG_COUNT: usize = 0 $(+ { _ = $values; 1 })*;
             assert!(ARG_COUNT <= $cap);
-            let mut v = cvt::NoResizableVec::new($cap);
+            let mut v = vectors::no_resizable_vec::NoResizableVec::new($cap);
             $(v.push($values);)*
             v
         }
@@ -417,10 +420,6 @@ macro_rules! cvt_no_resizable_vec {
 
 
 // Implement the Borsh serialization/deserialization traits for NoResizableVec.
-
-use std::io::Read;
-use anchor_lang::prelude::borsh::maybestd::io::Write;
-use borsh::{BorshDeserialize, BorshSerialize};
 
 impl<T> BorshSerialize for NoResizableVec<T> {
     fn serialize<W: Write>(&self, _writer: &mut W) -> borsh::maybestd::io::Result<()> {

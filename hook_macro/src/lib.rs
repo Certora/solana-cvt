@@ -4,7 +4,7 @@ use syn::{parse_macro_input, AttributeArgs, ItemFn};
 use quote::ToTokens;
 
 
-#[proc_macro_attribute]
+
 /**
  * This macro is used to insert a hook at the start of a function.
  * # Example
@@ -21,6 +21,7 @@ use quote::ToTokens;
         println!("t1");
     }
  */
+#[proc_macro_attribute]
 pub fn cvt_hook_start(attr: TokenStream, input: TokenStream) -> TokenStream {
     
     // parse the attribute argument
@@ -45,7 +46,7 @@ pub fn cvt_hook_start(attr: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 
-#[proc_macro_attribute]
+
 /**
  * This macro is used to insert a hook at the end of a function.
  * # Example
@@ -68,6 +69,7 @@ pub fn cvt_hook_start(attr: TokenStream, input: TokenStream) -> TokenStream {
     cvt_hook_start and cvt_hook_end are equivalent.
 
  */
+#[proc_macro_attribute]
 pub fn cvt_hook_end(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     // parse the attribute argument
