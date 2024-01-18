@@ -47,3 +47,22 @@ fn t2() {
     };
     hook();
 }
+fn tmp() -> Result<()> {
+    hook();
+    Ok(())
+}
+fn t3() {
+    match (&tmp(), &Ok(())) {
+        (left_val, right_val) => {
+            if !(*left_val == *right_val) {
+                let kind = ::core::panicking::AssertKind::Eq;
+                ::core::panicking::assert_failed(
+                    kind,
+                    &*left_val,
+                    &*right_val,
+                    ::core::option::Option::None,
+                );
+            }
+        }
+    };
+}
