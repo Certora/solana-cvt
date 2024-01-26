@@ -1,4 +1,5 @@
 use std::alloc::{alloc, Layout};
+use cvt::CVT_assume;
 
 /// A trait for giving a type a non-deterministic value
 pub trait Nondet: Sized {
@@ -13,10 +14,11 @@ pub trait Nondet: Sized {
         F: FnOnce(&Self) -> bool,
     {
         let val = Self::nondet();
-        crate::CVT_assume(func(&val));
+        CVT_assume(func(&val));
         val
     }
 }
+
 
 /// Return a nondet value of type according tot the Nondet trait
 pub fn nondet<T: Nondet>() -> T {
@@ -42,12 +44,13 @@ pub fn nondet_pointer<T: Nondet>() -> *mut T {
     unsafe {
         let layout = Layout::new::<T>();
         let ptr = alloc(layout) as *mut T;
-        crate::CVT_assume(!ptr.is_null());
+        CVT_assume(!ptr.is_null());
         *ptr = nondet();
         ptr
     }
 }
 
+#[macro_export]
 macro_rules! nondet_impl {
     ($t:ty, $v:expr, $doc:tt) => {
         impl Nondet for $t {
@@ -60,8 +63,26 @@ macro_rules! nondet_impl {
     };
 }
 
-pub(crate) use nondet_impl;
-use super::cvt;
+use cvt;
+use solana_program::{
+    account_info::AccountInfo,
+    pubkey::Pubkey
+};
+use stubs::solana_stubs;
+
+
+#[inline(never)]
+#[allow(non_snake_case)]
+pub fn CVT_nondet_account_info() -> AccountInfo<'static> {
+    solana_stubs::CVT_nondet_account_info_impl()
+}
+
+#[inline(never)]
+#[allow(non_snake_case)]
+pub fn CVT_nondet_pubkey() -> Pubkey {
+    solana_stubs::CVT_nondet_pubkey_impl()
+}
+
 
 nondet_impl! { (), (),  "No nondet value for  unit" }
 nondet_impl! { u8, cvt::CVT_nondet_u8(), "Nondet for u8" }
@@ -75,3 +96,8 @@ nondet_impl! { i64, cvt::CVT_nondet_i64(), "Nondet for i64" }
 nondet_impl! { usize, cvt::CVT_nondet_usize(), "Nondet for usize" }
 
 nondet_impl! { [u8; 32], cvt::CVT_nondet_array_of_32_bytes(), "Nondet for 32-byte array" }
+
+// E0117: need to implenet Nondet for Pubkey and AccountInfo here instead of solana/src/lib.rs
+// because we can only implement a trait for an arbitrary type in the crate where the trait is defined
+nondet_impl! {Pubkey, CVT_nondet_pubkey(), "Nondet for Pubkey" }
+nondet_impl! {AccountInfo<'static>, CVT_nondet_account_info(), "Nondet for AccountInfo" }

@@ -1,13 +1,13 @@
 use std::marker::PhantomData;
 use std::ops::Index;
-use {
-    crate::{
-        nondet::{
-            Nondet, nondet, nondet_pointer
-        },
-    }
-};
-use crate::{CVT_assume};
+use nondet::{
+        Nondet, nondet, nondet_pointer
+    };
+use cvt::{ CVT_assume, CVT_nondet_usize };
+
+use std::io::Read;
+use anchor_lang::prelude::borsh::maybestd::io::Write;
+use borsh::{BorshDeserialize, BorshSerialize};
 
 ////////////////////////////////////////////////////////////////////////
 // Adapted from Kani.
@@ -153,7 +153,7 @@ impl<T: Nondet> NoDataVec<T> {
     // At whichever position we insert the new element into, the overall effect on
     // the abstraction is that the length increases by 1.
     #[cfg_attr(feature = "certora-debug", inline(never))]
-    pub fn insert(&mut self, index: usize, _elem: T) {
+    pub fn insert(&mut self, _index: usize, _elem: T) {
         assert!(index <= self.len);
 
         self.len += 1;
@@ -164,7 +164,7 @@ impl<T: Nondet> NoDataVec<T> {
     // length decreases by 1. In the case that it is a valid removal, we return a
     // nondeterministic value.
     #[cfg_attr(feature = "certora-debug", inline(never))]
-    pub fn remove(&mut self, index: usize) -> T {
+    pub fn remove(&mut self, _index: usize) -> T {
         assert!(index < self.len);
 
         self.len -= 1;
@@ -219,7 +219,7 @@ impl<T: Nondet> NoDataVec<T> {
         }
     }
 
-    pub fn sort_by_key<K, F>(&mut self, f: F) where
+    pub fn sort_by_key<K, F>(&mut self, _f: F) where
         F: FnMut(&T) -> K,
         K: Ord,
     {
@@ -227,7 +227,7 @@ impl<T: Nondet> NoDataVec<T> {
     }
 
     #[cfg_attr(feature = "certora-debug", inline(never))]
-    pub fn get(&self, index: usize) -> Option<&T> {
+    pub fn get(&self, _index: usize) -> Option<&T> {
         assert!(index < self.len);
         // It's not ideal to allocate a pointer here but don't know a better solution
         // except returning a C pointer. The problem with returning a C pointer is that
@@ -351,4 +351,25 @@ macro_rules! cvt_no_data_vec {
     }
   };
 }
+
+// Implement the Borsh serialization/deserialization traits for NoDataVec.
+
+impl<T> BorshSerialize for NoDataVec<T> {
+    fn serialize<W: Write>(&self, _writer: &mut W) -> borsh::maybestd::io::Result<()> {
+        Ok(())
+    }
+}
+
+impl<T:Nondet> BorshDeserialize for NoDataVec<T> {
+    fn deserialize(_buf: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
+        let res = NoDataVec::with_len(CVT_nondet_usize()) ;
+        Ok(res)
+    }
+
+    fn deserialize_reader<R: Read>(_reader: &mut R) -> std::io::Result<Self> {
+        let res = NoDataVec::with_len(CVT_nondet_usize()) ;
+        Ok(res)
+    }
+}
+
 
