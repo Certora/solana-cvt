@@ -1,62 +1,45 @@
 extern crate alloc;
-use alloc::alloc::{Layout, alloc, dealloc, handle_alloc_error};
+use core::ptr::NonNull;
 use core::mem;
-use core::ops::{Deref, DerefMut, Index, IndexMut, Range};
-use core::ptr::{self, NonNull};
-use std::cmp::Ordering;
-use cvt::CVT_assume;
+use std::{ptr, ops::{Deref, DerefMut, Index, IndexMut}};
+use alloc::alloc::{Layout, alloc, dealloc};
 use nondet::Nondet;
 use std::io::Read;
 use anchor_lang::prelude::borsh::maybestd::io::Write;
+use anchor_lang::{AnchorSerialize, AnchorDeserialize};
 use borsh::{BorshDeserialize, BorshSerialize};
 
-////////////////////////////////////////////////////////////////////////
-// Adapted from SeaHorn.
-//
-// This is a more precise implementation of the Vector class than
-// NoDataVec but the vector is not resizable so its capacity must be
-// fixed a priori.
-////////////////////////////////////////////////////////////////////////
-
-trait IsZST { const IS_ZST: bool; }
-impl<T> IsZST for T { const IS_ZST: bool = mem::size_of::<T>() == 0; }
-
-macro_rules! assert {
-        ($cond:expr) => {{ /*cvt::CVT_assert($cond)*/}};
-}
-
+/////////////////////////
+/// Raw Vec
+/////////////////////////
 struct RawVec<T> {
     ptr: NonNull<T>,
     cap: usize,
 }
 
-unsafe impl<T: Send> Send for RawVec<T> {}
-unsafe impl<T: Sync> Sync for RawVec<T> {}
-
 impl<T> RawVec<T> {
-    // We assume that there is no errors during allocation.
+    fn new_zero_sized() -> Self {
+        Self {
+            ptr: NonNull::dangling(),
+            cap: 0,
+        }
+    }
+
     fn new(capacity: usize) -> Self {
-        if T::IS_ZST || capacity == 0 {
-            return RawVec {
-                ptr: NonNull::dangling(),
-                cap: capacity,
-            };
+
+        // ZSTs have no memory allocation
+        if mem::size_of::<T>() == 0 || capacity == 0 {
+            return RawVec::new_zero_sized();
         }
 
-        let layout: Layout = Layout::array::<T>(capacity).unwrap();
-	    //CVT_assume(layout.size() <= isize::MAX as usize);
-
-        let pointer: *mut u8 = unsafe { alloc(layout) };
-        let pointer: NonNull<T> = match NonNull::new(pointer as *mut T) {
-            Some(p) => p,
-            None => {
-                CVT_assume(false);
-                handle_alloc_error(layout)
-            },
+        let layout: Layout = Layout::array::<T>(capacity).unwrap_or_else(|_| panic!("capacity overflow"));
+        let ptr: NonNull<T> = unsafe {
+            let ptr: *mut u8 = alloc(layout);
+            NonNull::new_unchecked(ptr as *mut T)
         };
 
-        RawVec {
-            ptr: pointer,
+        Self {
+            ptr,
             cap: capacity,
         }
     }
@@ -64,45 +47,48 @@ impl<T> RawVec<T> {
 
 impl<T> Drop for RawVec<T> {
     fn drop(&mut self) {
-        if self.cap != 0 && !T::IS_ZST {
-            unsafe {
-                dealloc(
-                    self.ptr.as_ptr() as *mut u8,
-                    Layout::array::<T>(self.cap).unwrap(),
-                );
-            }
+        // ZSTs have no memory allocation
+        if mem::size_of::<T>() == 0 {
+            return;
+        }
+
+        let layout: Layout = Layout::array::<T>(self.cap).unwrap();
+        unsafe {
+            dealloc(self.ptr.as_ptr() as *mut u8, layout);
         }
     }
 }
 
+/////////////////////////
+/// NoResizableVec
+/////////////////////////
 pub struct NoResizableVec<T> {
     buf: RawVec<T>,
     len: usize,
 }
 
 impl<T> NoResizableVec<T> {
-    fn ptr(&self) -> *mut T {
-        self.buf.ptr.as_ptr()
-    }
-
-    pub fn cap(&self) -> usize {
-        self.buf.cap
-    }
-
-    pub fn len(&self) -> usize { self.len }
-
-    #[cfg_attr(feature = "certora-debug", inline(never))]
     pub fn new(capacity: usize) -> Self {
-        NoResizableVec {
+        Self {
             buf: RawVec::new(capacity),
             len: 0,
         }
     }
 
-    #[cfg_attr(feature = "certora-debug", inline(never))]
-    pub fn push(&mut self, elem: T) {
-        assert!(self.len < self.cap());
-        unsafe { ptr::write(self.ptr().add(self.len), elem); }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn capacity(&self) -> usize {
+        self.buf.cap
+    }
+
+    pub fn push(&mut self, value: T) {
+        assert!(self.buf.cap > self.len);
+        unsafe {
+            let end: *mut T = self.buf.ptr.as_ptr().add(self.len);
+            end.write(value);
+        }
         self.len += 1;
     }
 
@@ -111,233 +97,217 @@ impl<T> NoResizableVec<T> {
             None
         } else {
             self.len -= 1;
-            unsafe { Some(ptr::read(self.ptr().add(self.len))) }
-        }
-    }
-
-    pub fn find(& self, elem: &T) -> Option<usize>
-        where  T: Ord, {
-        let mut i = 0;
-        while i < self.len {
-            if self.index(i).cmp(elem) ==  Ordering::Equal {
-                return Some(i)
+            unsafe {
+                let end: *mut T = self.buf.ptr.as_ptr().add(self.len);
+                Some(end.read())
             }
-            i += 1;
         }
-        return None
     }
 
-    pub fn clone(&self) -> Self {
-        let vec = RawVec::new(self.cap());
-        let res = NoResizableVec {
-            buf: vec,
-            len: self.len,
-        };
-        unsafe {
-            ptr::copy_nonoverlapping(
-                self.ptr(),
-                res.ptr() ,
-                self.len
-            )
-        }
-        res
-    }
-
-    pub fn insert(&mut self, index: usize, elem: T) {
+    pub fn insert(&mut self, index: usize, value: T) {
+        assert!(self.buf.cap > self.len);
         assert!(index < self.len);
-        assert!(self.len < self.cap());
         unsafe {
-            ptr::copy(
-                self.ptr().add(index),
-                self.ptr().add(index + 1),
-                self.len - index,
-            );
-            ptr::write(self.ptr().add(index), elem);
-            self.len += 1;
+            let ptr: *mut T = self.buf.ptr.as_ptr().add(index);
+            ptr.copy_to(ptr.add(1), self.len - index);
+            ptr.write(value);
         }
+        self.len += 1;
     }
 
     pub fn remove(&mut self, index: usize) -> T {
         assert!(index < self.len);
         unsafe {
             self.len -= 1;
-            let result = ptr::read(self.ptr().add(index));
-            ptr::copy(
-                self.ptr().add(index + 1),
-                self.ptr().add(index),
-                self.len - index,
-            );
-            result
+            let ptr: *mut T = self.buf.ptr.as_ptr().add(index);
+            let value: T = ptr.read();
+            ptr.add(1).copy_to(ptr, self.len - index);
+            value
         }
     }
 
-    pub fn drain(&mut self, range: Range<usize>) -> Drain<T> {
-        unsafe {
-            let slice: &[T] = &*self;
-            let slice: &[T] = &slice[range.clone()];
-            let iter: RawValIter<T> = RawValIter::new(slice);
-
-            Drain {
-                const_range: range.clone(),
-                iter: iter,
-                // vec: PhantomData,
-                vec: self,
+    pub fn find(&self, value: &T) -> Option<usize> where T: Ord {
+        for i in 0..self.len {
+            unsafe {
+                let ptr: *mut T = self.buf.ptr.as_ptr().add(i);
+                if ptr.read() == *value {
+                    return Some(i);
+                }
             }
         }
-    }
-    pub fn drop(&mut self) {
-        // for i in 0..10 {
-        //     if i > self.cap { break; }
-        //     self.pop();
-        // }
+        None
     }
 }
 
 
 impl<T> Drop for NoResizableVec<T> {
     fn drop(&mut self) {
-        while let Some(_) = self.pop() { }
+        // do nothiing
+    }
+
+}
+
+//////////////////
+/// Other traits:
+/// - Clone
+/// - Deref
+/// - DerefMut
+/// - Index
+/// - IndexMut
+/// - BosrhSerialize
+/// - BorshDeserialize
+//////////////////
+
+impl<T> Clone for NoResizableVec<T> {
+    fn clone(&self) -> Self {
+        let raw_vec = RawVec::new(self.capacity());
+        let new_vec = Self {
+            buf: raw_vec,
+            len: self.len(),
+        };
+
+        unsafe {
+            ptr::copy_nonoverlapping(
+                self.buf.ptr.as_ptr(),
+                new_vec.buf.ptr.as_ptr(),
+                self.len()
+            );
+        }
+
+        new_vec
     }
 }
 
 impl<T> Deref for NoResizableVec<T> {
     type Target = [T];
+
     fn deref(&self) -> &[T] {
-        unsafe { core::slice::from_raw_parts(self.ptr(), self.len) }
+        unsafe {
+            core::slice::from_raw_parts(self.buf.ptr.as_ptr(), self.len())
+        }
     }
 }
 
 impl<T> DerefMut for NoResizableVec<T> {
     fn deref_mut(&mut self) -> &mut [T] {
-        unsafe { core::slice::from_raw_parts_mut(self.ptr(), self.len) }
+        unsafe {
+            core::slice::from_raw_parts_mut(self.buf.ptr.as_ptr(), self.len())
+        }
     }
 }
 
 impl<T> Index<usize> for NoResizableVec<T> {
     type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
+
+    fn index(&self, index: usize) -> &T {
         assert!(index < self.len());
         unsafe {
-            if T::IS_ZST { NonNull::<T>::dangling().as_ref() }
-            else { & *self.ptr().add(index) }
+            if mem::size_of::<T>() == 0 {
+                NonNull::<T>::dangling().as_ref()
+            } else {
+                &*self.buf.ptr.as_ptr().add(index)
+            }
         }
     }
 }
 
 impl<T> IndexMut<usize> for NoResizableVec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+    fn index_mut(&mut self, index: usize) -> &mut T {
         assert!(index < self.len());
         unsafe {
-            if T::IS_ZST { NonNull::<T>::dangling().as_mut() }
-            else { &mut *self.ptr().add(index) }
-        }
-    }
-}
-
-impl<T> IntoIterator for NoResizableVec<T> {
-    type Item = T;
-    type IntoIter = IntoIter<T>;
-
-    #[cfg_attr(feature = "certora-debug", inline(never))]
-    fn into_iter(self) -> IntoIter<T> {
-        unsafe {
-            let iter: RawValIter<T> = RawValIter::new(&self);
-            let buf: RawVec<T> = ptr::read(&self.buf);
-            mem::forget(self);
-
-            IntoIter {
-                iter,
-                _buf: buf,
+            if mem::size_of::<T>() == 0 {
+                NonNull::<T>::dangling().as_mut()
+            } else {
+                &mut *self.buf.ptr.as_ptr().add(index)
             }
         }
     }
 }
 
-struct RawValIter<T> {
+impl<T: AnchorSerialize> BorshSerialize for NoResizableVec<T> {
+    fn serialize<W: Write>(&self, writer: &mut W) -> borsh::maybestd::io::Result<()> {
+        let len = usize::try_from(self.len()).map_err(|_| std::io::ErrorKind::InvalidInput)?;
+        writer.write_all(&len.to_le_bytes())?;
+
+        let cap = usize::try_from(self.buf.cap).map_err(|_| std::io::ErrorKind::InvalidInput)?;
+        writer.write_all(&cap.to_le_bytes())?;
+
+        // serialize the vector
+        unsafe {
+            let slice = core::slice::from_raw_parts(self.buf.ptr.as_ptr(), self.len);
+            slice.serialize(writer)
+        }
+    }
+}
+
+/// We need to fix the capacity of the vector.
+/// However, this number depends on the specific verification task.
+impl<T:Nondet + AnchorDeserialize> BorshDeserialize for NoResizableVec<T> {
+    fn deserialize(buf: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
+        // Deserialize the len and capacity
+        let len = usize::deserialize(buf)?;
+        let capacity = usize::deserialize(buf)?;
+
+        // Currently, we don't rely on serialization / deserialization of
+        // the vector elements for verification tasks.
+        // So, we can just create a nondet vector of same len and capacity
+        let mut vec = NoResizableVec::<T>::new(capacity);
+        vec.len = len;
+
+        Ok(vec)
+    }
+
+    fn deserialize_reader<R: Read>(reader: &mut R) -> std::io::Result<Self> {
+        // Deserialize the len and capacity
+        let len = usize::deserialize_reader(reader)?;
+        let capacity = usize::deserialize_reader(reader)?;
+
+        // Currently, we don't rely on serialization / deserialization of
+        // the vector elements for verification tasks.
+        // So, we can just create a nondet vector of same len and capacity
+        let mut vec = NoResizableVec::<T>::new(capacity);
+        vec.len = len;
+
+        Ok(vec)
+    }
+}
+
+
+/////////////////////////
+/// Iterator
+/////////////////////////
+
+pub struct IntoIter<T> {
+    _buf: RawVec<T>,
     start: *const T,
     end: *const T,
 }
 
-impl<T> RawValIter<T> {
-    unsafe fn new(slice: &[T]) -> Self {
-        RawValIter {
-            start: slice.as_ptr(),
-            end: if T::IS_ZST {
-                ((slice.as_ptr() as usize) + slice.len()*mem::align_of::<T>()) as *const _
-            } else if slice.len() == 0 {
-                slice.as_ptr()
-            } else {
-                slice.as_ptr().add(slice.len())
-            },
-        }
-    }
-}
-
-impl<T> Iterator for RawValIter<T> {
-    type Item = T;
-
-    #[cfg_attr(feature = "certora-debug", inline(never))]
-    fn next(&mut self) -> Option<T> {
-        if self.start == self.end {
-            None
-        } else {
-            unsafe {
-                if T::IS_ZST {
-                    self.start = (self.start as usize + 1*mem::align_of::<T>()) as *const _;
-                    Some(ptr::read(NonNull::<T>::dangling().as_ptr()))
-                } else {
-                    let old_ptr = self.start;
-                    self.start = self.start.offset(1);
-                    Some(ptr::read(old_ptr))
-                }
-            }
-        }
-    }
-
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        // let elem_size: usize = mem::size_of::<T>();
-        let len: usize = (self.end as usize - self.start as usize)
-                  / if T::IS_ZST { 1*mem::align_of::<T>() } else { mem::size_of::<T>() };
-        (len, Some(len))
-    }
-}
-
-impl<T> DoubleEndedIterator for RawValIter<T> {
-    fn next_back(&mut self) -> Option<T> {
-        if self.start == self.end {
-            None
-        } else {
-            unsafe {
-                if T::IS_ZST {
-                    self.end = (self.end as usize - 1*mem::align_of::<T>()) as *const _;
-                    Some(ptr::read(NonNull::<T>::dangling().as_ptr()))
-                } else {
-                    self.end = self.end.offset(-1);
-                    Some(ptr::read(self.end))
-                }
-            }
-        }
-    }
-}
-
-pub struct IntoIter<T> {
-    _buf: RawVec<T>,
-    iter: RawValIter<T>,
-}
-
 impl<T> Iterator for IntoIter<T> {
     type Item = T;
-    fn next(&mut self) -> Option<T> {
-        self.iter.next()
-    }
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        self.iter.size_hint()
-    }
-}
 
-impl<T> DoubleEndedIterator for IntoIter<T> {
-    fn next_back(&mut self) -> Option<T> {
-        self.iter.next_back()
+    fn next(&mut self) -> Option<T> {
+        if self.start == self.end {
+            None
+        } else {
+            unsafe {
+                if mem::size_of::<T>() != 0 {
+                    let old: *const T = self.start;
+                    self.start = self.start.offset(1);
+                    Some(ptr::read(old))
+                } else {
+                    self.start = (self.start as usize + 1*mem::align_of::<T>()) as *const _;
+                    Some(ptr::read(NonNull::<T>::dangling().as_ptr()))
+                }
+            }
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let elem_size = mem::size_of::<T>();
+        let exact = (self.end as usize - self.start as usize) 
+                            / if elem_size == 0 { 1*mem::align_of::<T>() } else {elem_size};
+        (exact, Some(exact))
     }
 }
 
@@ -347,57 +317,38 @@ impl<T> Drop for IntoIter<T> {
     }
 }
 
-pub struct Drain<'a, T: 'a> {
-    const_range: Range<usize>,
-    vec: &'a mut NoResizableVec<T>,
-    iter: RawValIter<T>,
-}
+impl<T> IntoIterator for NoResizableVec<T> {
+    type Item =T;
+    type IntoIter = IntoIter<T>;
 
-impl<'a, T> Iterator for Drain<'a, T> {
-    type Item = T;
-    fn next(&mut self) -> Option<T> {
-        self.iter.next()
-    }
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        self.iter.size_hint()
-    }
-}
+    fn into_iter(self) -> IntoIter<T> {
+        unsafe {
+            let buf = ptr::read(&self.buf);
+            let len = self.len();
+            mem::forget(self);
 
-impl<'a, T> DoubleEndedIterator for Drain<'a, T> {
-    fn next_back(&mut self) -> Option<T> {
-        self.iter.next_back()
-    }
-}
-
-impl<'a, T> Drop for Drain<'a, T> {
-    fn drop(&mut self) {
-        for _ in &mut *self { }
-
-        if T::IS_ZST || self.const_range.len() == 0 {
-            self.vec.len -= self.const_range.len();
-        } else {
-            unsafe {
-                ptr::copy_nonoverlapping(
-                    self.vec.ptr().add(self.const_range.end),
-                    self.vec.ptr().add(self.const_range.start),
-                    self.vec.len() - self.const_range.end,
-                );
+            IntoIter {
+                start: buf.ptr.as_ptr(),
+                end: if mem::size_of::<T>() == 0 {
+                    (buf.ptr.as_ptr() as usize + len*mem::align_of::<T>()) as *const _
+                } else if len == 0 {
+                    buf.ptr.as_ptr()
+                } else {
+                    buf.ptr.as_ptr().add(len)
+                },
+                _buf: buf,
             }
-            self.vec.len -= self.const_range.len();
         }
     }
 }
 
-impl<T> Clone for NoResizableVec<T> {
-    fn clone(&self) -> Self {
-        NoResizableVec::clone(self)
-    }
-}
+/////////////////////
+/// Macros
+/////////////////////
 
 #[macro_export]
 macro_rules! cvt_no_resizable_vec {
-    // cvt_no_resizable_vec![1, 3, 2, 7]; => [1, 3, 2, 7], cap = 4*2 = 8
-   ($($values:expr),+ $(,)?) => (
+    ($(values:expr),+ $(,)?) => (
         {
             let ARG_COUNT: usize = 0 $(+ { _ = $values; 1 })*;
             let mut v = vectors::no_resizable_vec::NoResizableVec::new(ARG_COUNT*2);
@@ -406,7 +357,6 @@ macro_rules! cvt_no_resizable_vec {
         }
     );
 
-     // cvt_no_resizable_vec!([1, 3, 4]; 12); => [1, 3, 4], cap = 12
     ([$($values:expr),* $(,)?]; $cap:expr) => {
         {
             let ARG_COUNT: usize = 0 $(+ { _ = $values; 1 })*;
@@ -416,28 +366,5 @@ macro_rules! cvt_no_resizable_vec {
             v
         }
     };
-}
-
-
-// Implement the Borsh serialization/deserialization traits for NoResizableVec.
-
-impl<T> BorshSerialize for NoResizableVec<T> {
-    fn serialize<W: Write>(&self, _writer: &mut W) -> borsh::maybestd::io::Result<()> {
-        Ok(())
-    }
-}
-
-/// We need to fix the capacity of the vector.
-/// However, this number depends on the specific verification task.
-impl<T:Nondet> BorshDeserialize for NoResizableVec<T> {
-    fn deserialize(_buf: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
-        let res = NoResizableVec::new(10) ;
-        Ok(res)
-    }
-
-    fn deserialize_reader<R: Read>(_reader: &mut R) -> std::io::Result<Self> {
-        let res = NoResizableVec::new(10) ;
-        Ok(res)
-    }
 }
 
