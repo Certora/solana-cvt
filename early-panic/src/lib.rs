@@ -12,8 +12,10 @@ struct EearlyPanic;
 
 impl VisitMut for EearlyPanic {
     fn visit_expr_mut(&mut self, node: &mut Expr) {
-        if let Expr::Try(expr) = &node {
-            let prefix : &Expr = &*expr.expr;
+        if let Expr::Try(expr) = &mut *node {
+            let prefix : &mut Expr = expr.expr.as_mut();
+            // -- recurse on prefix since it might have nested q-mark
+            visit_mut::visit_expr_mut(self, prefix);
             *node = parse_quote!(#prefix.unwrap());
             return;
         }
