@@ -7,5 +7,6 @@ members = [
     "early-panic",
     "nondet", 
     "solana_cvt",
+    "cvt-macros",
     "stubs"
 ]
