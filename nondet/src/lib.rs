@@ -85,6 +85,7 @@ pub fn CVT_nondet_pubkey() -> Pubkey {
 
 
 nondet_impl! { (), (),  "No nondet value for  unit" }
+nondet_impl! { bool, cvt::CVT_nondet_u64() > 0, "Nondet for bool"}
 nondet_impl! { u8, cvt::CVT_nondet_u8(), "Nondet for u8" }
 nondet_impl! { i8, cvt::CVT_nondet_i8(), "Nondet for i8" }
 nondet_impl! { u16, cvt::CVT_nondet_u16(), "Nondet for u16" }
