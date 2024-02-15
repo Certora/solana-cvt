@@ -1,5 +1,5 @@
-use std::alloc::{alloc, Layout};
 use cvt::CVT_assume;
+use std::alloc::{alloc, Layout};
 
 /// A trait for giving a type a non-deterministic value
 pub trait Nondet: Sized {
@@ -18,7 +18,6 @@ pub trait Nondet: Sized {
         val
     }
 }
-
 
 /// Return a nondet value of type according tot the Nondet trait
 pub fn nondet<T: Nondet>() -> T {
@@ -64,12 +63,8 @@ macro_rules! nondet_impl {
 }
 
 use cvt;
-use solana_program::{
-    account_info::AccountInfo,
-    pubkey::Pubkey
-};
+use solana_program::{account_info::AccountInfo, pubkey::Pubkey};
 use stubs::solana_stubs;
-
 
 #[inline(never)]
 #[allow(non_snake_case)]
@@ -82,7 +77,6 @@ pub fn CVT_nondet_account_info() -> AccountInfo<'static> {
 pub fn CVT_nondet_pubkey() -> Pubkey {
     solana_stubs::CVT_nondet_pubkey_impl()
 }
-
 
 nondet_impl! { (), (),  "No nondet value for  unit" }
 nondet_impl! { bool, cvt::CVT_nondet_u64() > 0, "Nondet for bool"}
@@ -102,3 +96,14 @@ nondet_impl! { [u8; 32], cvt::CVT_nondet_array_of_32_bytes(), "Nondet for 32-byt
 // because we can only implement a trait for an arbitrary type in the crate where the trait is defined
 nondet_impl! {Pubkey, CVT_nondet_pubkey(), "Nondet for Pubkey" }
 nondet_impl! {AccountInfo<'static>, CVT_nondet_account_info(), "Nondet for AccountInfo" }
+
+impl<T: Nondet> Nondet for Option<T> {
+    #[inline]
+    fn nondet() -> Option<T> {
+        if nondet::<bool>() {
+            Some(nondet::<T>())
+        } else {
+            None
+        }
+    }
+}
