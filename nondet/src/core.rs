@@ -2,8 +2,10 @@
 /// A trait for giving a type a non-deterministic value
 pub trait Nondet: Sized {
     fn nondet() -> Self;
+
+    #[cfg(feature = "std")]
     fn nondet_ref() -> &'static mut Self {
-        Box::leak(Box::new(Self::nondet()))
+        std::boxed::Box::leak(std::boxed::Box::new(Self::nondet()))
     }
 
     /// i32::nondet_with(|x| x > 0)
@@ -22,6 +24,7 @@ pub fn nondet<T: Nondet>() -> T {
     Nondet::nondet()
 }
 
+#[cfg(feature = "std")]
 pub fn nondet_ref<T: Nondet>() -> &'static mut T {
     Nondet::nondet_ref()
 }
