@@ -1,11 +1,14 @@
 [package]
 name = "nondet"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+default = ["solana", "std"]
+solana = ["dep:solana-program"]
+std = []
 
 [dependencies]
-solana-program = "1.14.10"
+solana-program = {version = "1.14.10", optional=true}
 cvt = { path = "../cvt" }
 stubs = { path = "../stubs" }

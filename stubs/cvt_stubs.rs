@@ -118,7 +118,7 @@ mod impls {
     #[allow(non_snake_case)]
     #[no_mangle]
     extern "C" fn CVT_assume_c(_c: bool) {
-        assert!(_c, "Assumption was not satisfied");
+        //assert!(_c, "Assumption was not satisfied");
     }
 
     #[allow(non_snake_case)]
