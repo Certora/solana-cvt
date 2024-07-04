@@ -1,4 +1,5 @@
 
+#![no_std]
 use stubs::cvt_stubs;
 
 #[inline(never)]
