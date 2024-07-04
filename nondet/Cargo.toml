@@ -5,7 +5,7 @@ edition = "2021"
 
 [features]
 default = ["solana", "std"]
-solana = ["dep:solana-program"]
+solana = ["dep:solana-program", "stubs/solana"]
 std = []
 
 [dependencies]
