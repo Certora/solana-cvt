@@ -6,10 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
 # include implementations for stubs for linking
-impls = ["dep:solana-sdk"]
+default = ["solana"]
+solana = ["dep:solana-program"]
+impls = ["solana", "dep:solana-sdk"]
 
 [dependencies]
-solana-program = "1.17"
+solana-program = {version = "1.17", optional = true}
 solana-sdk = { version = "1.17", optional = true  }
 
 [lib]
