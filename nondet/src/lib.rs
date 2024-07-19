@@ -10,7 +10,7 @@ mod solana;
 #[cfg(feature = "std")]
 mod aggregates;
 
-pub use core::*;
+pub use crate::core::*;
 #[cfg(feature = "solana")]
 pub use solana::*;
 #[cfg(feature = "std")]
