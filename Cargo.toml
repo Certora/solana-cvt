@@ -8,5 +8,6 @@ members = [
     "nondet", 
     "solana_cvt",
     "cvt-macros",
-    "stubs"
+    "stubs",
+    "calltrace"
 ]

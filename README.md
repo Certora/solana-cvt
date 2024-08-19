@@ -11,3 +11,4 @@ It includes the following crates:
 - `nondet` [TODO: description]
 - `solana_cvt` [TODO: description]
 - `stubs` [TODO: description]
+- `calltrace` - Defines macros to print values in the Solana's prover calltrace
