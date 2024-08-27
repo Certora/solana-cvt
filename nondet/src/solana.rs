@@ -1,3 +1,5 @@
+#![allow(unused_doc_comments)]
+
 use crate::{nondet, Nondet};
 
 use solana_program::{account_info::AccountInfo, pubkey::Pubkey};
