@@ -1,5 +1,5 @@
 [package]
-name = "solana_nd"
+name = "solana_cvt"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 solana-program = "1.14.10"
+cvt = { path = "../cvt" }
+nondet = { path = "../nondet" }
