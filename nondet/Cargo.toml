@@ -6,9 +6,11 @@ edition = "2021"
 [features]
 default = ["solana", "std"]
 solana = ["dep:solana-program", "stubs/solana"]
+soroban = ["dep:soroban-sdk"]
 std = []
 
 [dependencies]
+soroban-sdk = { version = "20.3.1", optional = true}
 solana-program = {version = "1.14.10", optional=true}
 cvt = { path = "../cvt" }
 stubs = { path = "../stubs" }
