@@ -18,4 +18,4 @@ pub use solana::*;
 #[cfg(feature = "std")]
 pub use aggregates::*;
 #[cfg(feature = "soroban")]
-mod soroban;
+pub use soroban::*;
