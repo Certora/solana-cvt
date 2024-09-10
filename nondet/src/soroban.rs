@@ -43,6 +43,9 @@ pub fn CVT_nondet_val_impl() -> Address {
     }
 }
 
+crate::nondet_impl! {Address, CVT_nondet_address(), "Nondet for Address" }
+crate::nondet_impl! {Val, CVT_nondet_val(), "Nondet for Val" }
+
 #[allow(improper_ctypes,improper_ctypes_definitions)]
 #[no_mangle]
 extern "C" fn mk_nondet_val() -> Val {
