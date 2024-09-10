@@ -1,4 +1,3 @@
-
 use soroban_sdk::{Address, Env, TryFromVal, Val};
 
 use crate::{nondet, Nondet};
@@ -16,45 +15,3 @@ impl Nondet for Address {
         Address::try_from_val(&Env::default(), &Val::nondet()).unwrap()
     }
 }
-
-// #[inline(never)]
-// #[allow(non_snake_case)]
-// pub fn CVT_nondet_address() -> Address {
-//     CVT_nondet_account_info_impl()
-// }
-
-// #[inline(never)]
-// #[allow(non_snake_case)]
-// pub fn CVT_nondet_val() -> Val {
-//     CVT_nondet_val_impl()
-// }
-
-// #[allow(non_snake_case)]
-// pub fn CVT_nondet_address_impl() -> Address {
-//     unsafe {
-//         return mk_nondet_address();
-//     }
-// }
-
-// #[allow(non_snake_case)]
-// pub fn CVT_nondet_val_impl() -> Val {
-//     unsafe {
-//         return mk_nondet_val();
-//     }
-// }
-
-// crate::nondet_impl! {Address, CVT_nondet_address(), "Nondet for Address" }
-// crate::nondet_impl! {Val, CVT_nondet_val(), "Nondet for Val" }
-
-// #[allow(improper_ctypes,improper_ctypes_definitions)]
-// #[no_mangle]
-// extern "C" fn mk_nondet_val() -> Val {
-//     let v: u64 = u64::nondet();
-//     Val::try_from_val(&Env::default(), &(&(v << 8) | (77 as u64))).unwrap()
-// }
-
-// #[allow(improper_ctypes,improper_ctypes_definitions)]
-// #[no_mangle]
-// extern "C" fn mk_nondet_address() -> Address {
-//     Address::try_from_val(&Env::default(), &mk_nondet_val()).unwrap()
-// }
