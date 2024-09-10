@@ -1,7 +1,7 @@
 
 use soroban_sdk::{Address, Env, TryFromVal, Val};
 
-use nondet::{*};
+use crate::{nondet, Nondet};
 
 // impl Nondet for Val {
 //     fn nondet() -> Self {
@@ -37,7 +37,7 @@ pub fn CVT_nondet_address_impl() -> Address {
 }
 
 #[allow(non_snake_case)]
-pub fn CVT_nondet_val_impl() -> Address {
+pub fn CVT_nondet_val_impl() -> Val {
     unsafe {
         return mk_nondet_val();
     }
