@@ -106,7 +106,7 @@ impl<T> NoResizableVec<T> {
 
     pub fn insert(&mut self, index: usize, value: T) {
         assert!(self.buf.cap > self.len);
-        assert!(index < self.len);
+        assert!(index <= self.len);
         unsafe {
             let ptr: *mut T = self.buf.ptr.as_ptr().add(index);
             ptr.copy_to(ptr.add(1), self.len - index);
