@@ -10,12 +10,16 @@ extern "C" {
     fn CVT_nondet_u16_c() -> u16;
     fn CVT_nondet_u32_c() -> u32;
     fn CVT_nondet_u64_c() -> u64;
+    fn CVT_nondet_small_u128_c() -> u128;    
+    fn CVT_nondet_u128_c() -> u128;    
     fn CVT_nondet_usize_c() -> usize;
 
     fn CVT_nondet_i8_c() -> i8;
     fn CVT_nondet_i16_c() -> i16;
     fn CVT_nondet_i32_c() -> i32;
     fn CVT_nondet_i64_c() -> i64;
+    fn CVT_nondet_small_i128_c() -> i128;    
+    fn CVT_nondet_i128_c() -> i128;    
 }
 
 #[allow(non_snake_case)]
@@ -55,6 +59,18 @@ pub fn CVT_nondet_u64_impl() -> u64 {
     }
 }
 #[allow(non_snake_case)]
+pub fn CVT_nondet_u128_impl() -> u128 {
+    unsafe {
+        return CVT_nondet_u128_c();
+    }
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_small_u128_impl() -> u128 {
+    unsafe {
+        return CVT_nondet_small_u128_c();
+    }
+}
+#[allow(non_snake_case)]
 pub fn CVT_nondet_usize_impl() -> usize {
     unsafe {
         return CVT_nondet_usize_c();
@@ -82,6 +98,18 @@ pub fn CVT_nondet_i32_impl() -> i32 {
 pub fn CVT_nondet_i64_impl() -> i64 {
     unsafe {
         return CVT_nondet_i64_c();
+    }
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_i128_impl() -> i128 {
+    unsafe {
+        return CVT_nondet_i128_c();
+    }
+}
+#[allow(non_snake_case)]
+pub fn CVT_nondet_small_i128_impl() -> i128 {
+    unsafe {
+        return CVT_nondet_small_i128_c();
     }
 }
 

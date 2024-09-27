@@ -47,6 +47,19 @@ pub fn CVT_nondet_u64() ->  u64 {
 
 #[inline(never)]
 #[allow(non_snake_case)]
+pub fn CVT_nondet_u128() ->  u128 {
+    cvt_stubs::CVT_nondet_u128_impl()
+}
+
+#[inline(never)]
+#[allow(non_snake_case)]
+/// It is known to fit in u64
+pub fn CVT_nondet_small_u128() ->  u128 {
+    cvt_stubs::CVT_nondet_small_u128_impl()
+}
+
+#[inline(never)]
+#[allow(non_snake_case)]
 pub fn CVT_nondet_usize() ->  usize { cvt_stubs::CVT_nondet_usize_impl() }
 
 #[inline(never)]
@@ -71,6 +84,19 @@ pub fn CVT_nondet_i32() -> i32 {
 #[allow(non_snake_case)]
 pub fn CVT_nondet_i64() ->  i64 {
     cvt_stubs::CVT_nondet_i64_impl()
+}
+
+#[inline(never)]
+#[allow(non_snake_case)]
+pub fn CVT_nondet_i128() ->  i128 {
+    cvt_stubs::CVT_nondet_i128_impl()
+}
+
+#[inline(never)]
+#[allow(non_snake_case)]
+/// It is known to fit in i64
+pub fn CVT_nondet_small_i128() ->  i128 {
+    cvt_stubs::CVT_nondet_small_i128_impl()
 }
 
 extern "C" {

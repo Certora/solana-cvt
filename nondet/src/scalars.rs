@@ -10,4 +10,7 @@ crate::nondet_impl! { u32, cvt::CVT_nondet_u32(), "Nondet for u32" }
 crate::nondet_impl! { i32, cvt::CVT_nondet_i32(), "Nondet for i32" }
 crate::nondet_impl! { u64, cvt::CVT_nondet_u64(), "Nondet for u64" }
 crate::nondet_impl! { i64, cvt::CVT_nondet_i64(), "Nondet for i64" }
+crate::nondet_impl! { u128, cvt::CVT_nondet_u128(), "Nondet for u128" }
+crate::nondet_impl! { i128, cvt::CVT_nondet_i128(), "Nondet for i128" }
+
 crate::nondet_impl! { usize, cvt::CVT_nondet_usize(), "Nondet for usize" }
