@@ -2,3 +2,6 @@
 name = "cvt-soroban"
 version = "0.1.0"
 edition = "2021"
+
+[dependencies]
+soroban-sdk = { version = "21.6.0" }
