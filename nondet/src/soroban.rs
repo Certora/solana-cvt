@@ -1,13 +1,17 @@
 use soroban_sdk::{Address, Env, TryFromVal, Val, String, Bytes};
 
-use crate::{nondet, Nondet};
+use crate::{Nondet};
 
 impl Nondet for u128 {
     fn nondet() -> Self {
         let u1 = u64::nondet();
         let u2 = u64::nondet();
-        ((u1 as u128) << 64 | u2 as u128)
+        (u1 as u128) << 64 | u2 as u128
     }
+}
+
+impl Nondet for i128 {
+    fn nondet() -> i128 { u128::nondet() as i128 }
 }
 
 impl Nondet for Address {
