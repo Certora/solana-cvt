@@ -3,6 +3,7 @@ resolver = "2"
 members = [ 
     "vectors", 
     "cvt", 
+    "cvt-soroban", 
     "hook_macro",
     "early-panic",
     "nondet", 
