@@ -10,5 +10,6 @@ members = [
     "solana_cvt",
     "cvt-macros",
     "stubs",
-    "calltrace"
+    "calltrace",
+    "cvt-soroban-macros"
 ]
