@@ -10,6 +10,13 @@ pub fn CVT_assume(c: bool){
 
 #[inline(never)]
 #[allow(non_snake_case)]
+pub fn CVT_assign(x: usize, y: usize){
+    cvt_stubs::CVT_assign_impl(x, y)
+}
+
+
+#[inline(never)]
+#[allow(non_snake_case)]
 pub fn CVT_assert(c: bool){
     cvt_stubs::CVT_assert_impl(c)
 }

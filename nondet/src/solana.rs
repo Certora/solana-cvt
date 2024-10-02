@@ -64,7 +64,8 @@ macro_rules! mem_layout_rc_data {
     ($acc_info: expr, $start_addr: expr, $num_acc: expr) => {{
          // We need the start of the Rc. The method as_ptr() returns the address of &[u8]
         let data_rc = unsafe {$acc_info.data.as_ptr().offset(-24)} as *const _;
-        cvt::CVT_assume(data_rc == ($start_addr + (512*$num_acc)) as *const _);
+	let x = data_rc == ($start_addr + (512*$num_acc)) as *const _;
+        cvt::CVT_assume(x);
     }};
 }
 
@@ -73,6 +74,7 @@ macro_rules! mem_layout_data {
     ($acc_info_prev: expr, $acc_info: expr, $data_sz: expr) => {{
         let prev_data_ptr = $acc_info_prev.data.borrow().as_ptr();
         let data_ptr = $acc_info.data.borrow().as_ptr();
+        cvt::CVT_assign(data_ptr as usize, ((prev_data_ptr as usize + $data_sz) as *const u8) as usize);	
         cvt::CVT_assume((prev_data_ptr as usize + $data_sz) as *const u8 == data_ptr);
     }};
 }
@@ -82,7 +84,8 @@ macro_rules! mem_layout_rc_lamport {
     ($acc_info: expr, $start_addr: expr, $num_acc: expr) => {{
          // We need the start of the Rc. The method as_ptr() returns the address of T
         let lamports_rc = unsafe {$acc_info.lamports.as_ptr().offset(-24)} as *const _;
-        cvt::CVT_assume(lamports_rc == ($start_addr + (64*$num_acc)) as *const _);
+	let x = lamports_rc == ($start_addr + (64*$num_acc)) as *const _;
+        cvt::CVT_assume(x);	
     }};
 }
 
@@ -91,7 +94,8 @@ macro_rules! mem_layout_lamport {
     ($acc_info_prev: expr, $acc_info: expr, $data_sz: expr) => {{
         let prev_lamports_ptr = *$acc_info_prev.lamports.borrow() as *const u64;
         let lamports_ptr = *$acc_info.lamports.borrow() as *const u64;
-        cvt::CVT_assume((prev_lamports_ptr as usize + $data_sz) as *const u64 == lamports_ptr);
+	let x = (prev_lamports_ptr as usize + $data_sz) as *const u64 == lamports_ptr;
+        cvt::CVT_assume(x);	
     }};
 }
 
@@ -99,7 +103,8 @@ macro_rules! mem_layout_lamport {
 macro_rules! mem_layout_key {
     ($acc_info: expr, $start_addr: expr, $num_acc: expr) => {{
         let key_ptr = &*$acc_info.key as *const _;
-        cvt::CVT_assume(key_ptr as usize == $start_addr + (64*$num_acc));
+	let x = key_ptr as usize == $start_addr + (64*$num_acc);
+        cvt::CVT_assume(x);	
     }};
 }
 
@@ -107,7 +112,8 @@ macro_rules! mem_layout_key {
 macro_rules! mem_layout_owner {
     ($acc_info: expr, $start_addr: expr, $num_acc: expr) => {{
         let owner_ptr = &*$acc_info.owner as *const _;
-        cvt::CVT_assume(owner_ptr as usize == $start_addr + (64*$num_acc));
+	let x = owner_ptr as usize == $start_addr + (64*$num_acc);
+        cvt::CVT_assume(x);	
     }};
 }
 
@@ -155,7 +161,8 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
         let data_sz: usize = 10485760 + 8;
 
         let acc1_data_ptr = acc1.data.borrow().as_ptr();
-        cvt::CVT_assume(acc1_data_ptr  == start_addr as *const u8);
+        cvt::CVT_assign(acc1_data_ptr as usize, (start_addr as *const u8) as usize);
+        cvt::CVT_assume(acc1_data_ptr  == start_addr as *const u8);	
         mem_layout_data!(acc1, acc2, data_sz);
         mem_layout_data!(acc2, acc3, data_sz);
         mem_layout_data!(acc3, acc4, data_sz);
@@ -195,7 +202,8 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
         /// layout of lamports
         let start_addr:usize = 0x40A_000_480;
         let acc1_lamports_ptr = *acc1.lamports.borrow() as *const u64;
-        cvt::CVT_assume(acc1_lamports_ptr  == start_addr as *const u64);
+	let x = acc1_lamports_ptr  == start_addr as *const u64;
+        cvt::CVT_assume(x);	
 
         mem_layout_lamport!(acc1, acc2, 8);
         mem_layout_lamport!(acc2, acc3, 8);

@@ -1,6 +1,7 @@
 extern "C" {
     // External assume and assert
     fn CVT_assume_c(_c: bool);
+    fn CVT_assign_c(_x: usize, _y: usize);    
     fn CVT_assert_c(_c: bool);
 }
 
@@ -28,6 +29,14 @@ pub fn CVT_assume_impl(c: bool) {
         CVT_assume_c(c);
     }
 }
+
+#[allow(non_snake_case)]
+pub fn CVT_assign_impl(x: usize, y: usize) {
+    unsafe {
+        CVT_assign_c(x, y);
+    }
+}
+
 #[allow(non_snake_case)]
 pub fn CVT_assert_impl(c: bool) {
     unsafe {
