@@ -75,9 +75,17 @@ macro_rules! mem_layout_data {
         let prev_data_ptr = $acc_info_prev.data.borrow().as_ptr();
         let data_ptr = $acc_info.data.borrow().as_ptr();
         cvt::CVT_assign(data_ptr as usize, ((prev_data_ptr as usize + $data_sz) as *const u8) as usize);	
-        cvt::CVT_assume((prev_data_ptr as usize + $data_sz) as *const u8 == data_ptr);
     }};
 }
+
+/// Memory layout of AccountInfo field `data` as `[u8]`
+macro_rules! mem_layout_data2 {
+    ($acc_info: expr, $start_addr: expr, $num_acc: expr, $data_sz: expr) => {{
+        let data_ptr = $acc_info.data.borrow().as_ptr();
+        cvt::CVT_assign(data_ptr as usize, $start_addr as usize + ($data_sz*$num_acc));	
+    }};
+}
+
 
 /// Memory layout of AccountInfo field `lamports` as `Rc<RefCell<&u64>>`
 macro_rules! mem_layout_rc_lamport {
@@ -162,7 +170,6 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
 
         let acc1_data_ptr = acc1.data.borrow().as_ptr();
         cvt::CVT_assign(acc1_data_ptr as usize, (start_addr as *const u8) as usize);
-        cvt::CVT_assume(acc1_data_ptr  == start_addr as *const u8);	
         mem_layout_data!(acc1, acc2, data_sz);
         mem_layout_data!(acc2, acc3, data_sz);
         mem_layout_data!(acc3, acc4, data_sz);
@@ -178,6 +185,25 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
         mem_layout_data!(acc13, acc14, data_sz);
         mem_layout_data!(acc14, acc15, data_sz);
         mem_layout_data!(acc15, acc16, data_sz);
+
+
+        /*mem_layout_data2!(acc1, start_addr, 0, data_sz);
+        mem_layout_data2!(acc2, start_addr, 1, data_sz);
+        mem_layout_data2!(acc3, start_addr, 2, data_sz);
+        mem_layout_data2!(acc4, start_addr, 3, data_sz);
+        mem_layout_data2!(acc5, start_addr, 4, data_sz);
+        mem_layout_data2!(acc6, start_addr, 5, data_sz);
+        mem_layout_data2!(acc7, start_addr, 6, data_sz);
+        mem_layout_data2!(acc8, start_addr, 7, data_sz);
+        mem_layout_data2!(acc9, start_addr, 8, data_sz);
+        mem_layout_data2!(acc10, start_addr, 9, data_sz);
+        mem_layout_data2!(acc11, start_addr, 10, data_sz);
+        mem_layout_data2!(acc12, start_addr, 11, data_sz);
+        mem_layout_data2!(acc13, start_addr, 12, data_sz);
+        mem_layout_data2!(acc14, start_addr, 13, data_sz);
+        mem_layout_data2!(acc15, start_addr, 14, data_sz);
+        mem_layout_data2!(acc16, start_addr, 15, data_sz);*/	
+	
     }
     {   /// layout of lamports Rc<RefCell<T>>
         let start_addr:usize = 0x40A_000_080;
