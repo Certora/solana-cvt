@@ -117,6 +117,7 @@ fn derive_client_impl(crate_path: &Path, name: &str, fns: &[syn::TraitItemFn]) -
            match f.default {
                None =>
                    quote! {
+                       #[allow(unused)]
                        pub fn #fn_ident(&self, #(#binds),*) -> #fn_output {
                            nondet::nondet()
                        }
