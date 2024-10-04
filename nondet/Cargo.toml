@@ -1,14 +1,16 @@
 [package]
 name = "nondet"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 
 [features]
 default = ["solana", "std"]
 solana = ["dep:solana-program", "stubs/solana"]
 std = []
+derive = ["derive_nondet"]
 
 [dependencies]
 solana-program = {version = "1.14.10", optional=true}
 cvt = { path = "../cvt" }
 stubs = { path = "../stubs" }
+derive_nondet = { version = "0.3.0", path = "./derive", optional=true }

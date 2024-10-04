@@ -3,15 +3,18 @@
 #[cfg(feature = "std")]
 extern crate std;
 
+#[cfg(feature = "std")]
+mod aggregates;
 mod core;
 mod scalars;
 #[cfg(feature = "solana")]
 mod solana;
-#[cfg(feature = "std")]
-mod aggregates;
 
 pub use crate::core::*;
-#[cfg(feature = "solana")]
-pub use solana::*;
 #[cfg(feature = "std")]
 pub use aggregates::*;
+#[cfg(feature = "solana")]
+pub use solana::*;
+
+#[cfg(feature = "derive")]
+pub use derive_nondet::*;
