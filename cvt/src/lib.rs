@@ -17,8 +17,7 @@ pub fn CVT_assert(c: bool){
 #[inline(always)]
 #[allow(non_snake_case)]
 pub fn CVT_satisfy(c: bool){
-    CVT_assume(c);
-    CVT_assert(false);
+    cvt_stubs::CVT_satisfy_impl(c)
 }
 
 #[inline(never)]
@@ -148,4 +147,9 @@ macro_rules! require_neq {
 #[macro_export]
 macro_rules! assert {
         ($cond:expr) => {{ cvt::CVT_assert($cond)}};
+}
+
+#[macro_export]
+macro_rules! satisfy {
+        ($cond:expr) => {{ cvt::CVT_satisfy($cond)}};
 }
