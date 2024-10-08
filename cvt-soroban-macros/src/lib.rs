@@ -2,6 +2,7 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use darling::{FromMeta, ast::NestedMeta};
 use quote::{quote, format_ident};
+use uuid::Uuid;
 use syn::{
     parse_macro_input,
     parse_str,
@@ -19,6 +20,11 @@ use syn::{
     Type,
     TypeReference,
     TypePath,
+    punctuated::Punctuated,
+    Token,
+    token::Comma,
+    parse::Parse,
+    parse::ParseStream,
 };
 
 fn default_crate_path() -> Path {
@@ -278,4 +284,44 @@ pub fn derive_nondet(item: TokenStream) -> TokenStream {
             }
         }
     }
+}
+
+struct Idents {
+    idents: Punctuated<Ident, Comma>
+}
+
+impl Parse for Idents {
+    fn parse(input: ParseStream) -> syn::parse::Result<Self> {
+        Ok(Idents{
+            idents: input.parse_terminated(Ident::parse, Token![,])?
+        })
+    }
+}
+
+#[proc_macro]
+pub fn declare_rules(input: TokenStream) -> TokenStream {
+    let clone = input.clone();
+    let x = parse_macro_input!(input as Idents);
+    let rules = x.idents.iter()
+                        .flat_map(|i| format!("{}\0", i.to_string()).into_bytes()).collect::<Vec<u8>>();
+    let rule_lit = proc_macro2::Literal::byte_string(rules.as_slice());
+    let rule_size: usize = rules.len();
+    let rule_set_name = format_ident!("{}", format!("RULES_{}", Uuid::new_v4().simple()));
+
+    quote! {
+        #[cfg_attr(target_family = "wasm", link_section = "certora_rules")]
+        pub static #rule_set_name: [u8; #rule_size] = *#rule_lit;
+    }.into()
+}
+
+#[proc_macro_attribute]
+pub fn rule(_attr: TokenStream, input: TokenStream) -> TokenStream {
+    let fnItem = parse_macro_input!(input as syn::ItemFn);
+    let rule_name = format_ident!("{}", &fnItem.sig.ident);
+
+    quote!{
+        declare_rules!(#rule_name);
+        #[no_mangle]
+        #fnItem
+    }.into()
 }

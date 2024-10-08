@@ -7,6 +7,7 @@ edition = "2021"
 proc-macro = true
 
 [dependencies]
+uuid = { version = "1.10.0", features = [ "v4" ] }
 soroban-sdk = { version = "21.6.0" }
 soroban-sdk-macros = { version = "21.6.0" }
 quote = { version = "1.0" }
