@@ -175,3 +175,5 @@ macro_rules! require_neq {
 macro_rules! assert {
         ($cond:expr) => {{ cvt::CVT_assert($cond)}};
 }
+
+pub mod asserts;
