@@ -280,5 +280,5 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
 
 #[macro_export]
 macro_rules! acc_infos_with_mem_layout {
-    () => {fun_acc_infos_with_mem_layout()}
+    () => {::nondet::fun_acc_infos_with_mem_layout()}
 }
