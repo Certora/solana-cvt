@@ -1,6 +1,6 @@
 [package]
 name = "solana_cvt"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -9,3 +9,4 @@ edition = "2021"
 solana-program = "1.14.10"
 cvt = { path = "../cvt" }
 nondet = { path = "../nondet" }
+arrayref = "0.3.7"
