@@ -9,6 +9,8 @@ mod core;
 mod scalars;
 #[cfg(feature = "solana")]
 mod solana;
+#[cfg(feature = "spl_token")]
+pub mod spl_token;
 
 pub use crate::core::*;
 #[cfg(feature = "std")]

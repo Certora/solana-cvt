@@ -5,6 +5,16 @@ use crate::{nondet, Nondet};
 use solana_program::{account_info::AccountInfo, pubkey::Pubkey};
 use stubs::solana_stubs;
 
+impl<T: Nondet> Nondet for solana_program::program_option::COption<T> {
+    fn nondet() -> Self {
+        if nondet::<bool>() {
+            Self::None
+        } else {
+            Self::Some(nondet::<T>())
+        }
+    }
+}
+
 #[inline(never)]
 #[allow(non_snake_case)]
 pub fn CVT_nondet_account_info() -> AccountInfo<'static> {
