@@ -37,7 +37,7 @@ macro_rules! make_callable {
 macro_rules! parametric_rule {
     ($f:ident, ($($call:ident),+)) => {
         $(paste::paste!(
-            #[no_mangle]
+            #[rule]
             pub fn [< $f _ $call >](e: Env, c: [< call_ $call >]) {
                 $f::<[< call_ $call >]>(e, c);
             }
