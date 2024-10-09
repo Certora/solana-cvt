@@ -97,3 +97,57 @@ pub fn spl_token_2022_transfer<'a>(
 ) -> ProgramResult {
     spl_transfer(src_info, dst_info, authority_info, amount)
 }
+
+
+/// Summary for SPL Token MintTo instruction
+pub fn spl_mint_to<'a> (
+    mint_info: &AccountInfo<'a>,
+    dst_info: &AccountInfo<'a>,
+    _authority: &AccountInfo<'a>,
+    amount: u64
+) -> ProgramResult {
+
+    let mut mint_supply = spl_mint_get_supply(mint_info);
+    let mut dst_amount = spl_token_account_get_amount(dst_info);
+
+    mint_supply = mint_supply.checked_add(amount).unwrap();
+    dst_amount = dst_amount.checked_add(amount).unwrap();
+
+    spl_mint_set_supply(mint_supply, mint_info);
+    spl_token_account_set_amount(dst_amount, dst_info);
+
+    Ok(())
+}
+
+/// Summary for SPL Token Burn instruction
+pub fn spl_burn<'a> (
+    mint_info: &AccountInfo<'a>,
+    src_info: &AccountInfo<'a>,
+    _authority: &AccountInfo<'a>,
+    amount: u64
+) -> ProgramResult {
+
+    let mut mint_supply = spl_mint_get_supply(mint_info);
+    let mut src_amount = spl_token_account_get_amount(src_info);
+
+    // -- enough funds to burn
+    ::cvt::cvt_assume!(amount >= src_amount);
+
+    mint_supply = mint_supply.checked_sub(amount).unwrap();
+    src_amount = src_amount.checked_sub(amount).unwrap();
+
+    spl_mint_set_supply(mint_supply, mint_info);
+    spl_token_account_set_amount(src_amount, src_info);
+
+    Ok(())
+}
+
+/// Same as spl_burn, but sings with withdraw_ticket PDA
+pub fn spl_burn_withdraw_ticket<'a> (
+    mint_info: &AccountInfo<'a>,
+    src_info: &AccountInfo<'a>,
+    authority: &AccountInfo<'a>,
+    amount: u64
+) -> ProgramResult {
+    spl_burn(mint_info, src_info, authority, amount)
+}
