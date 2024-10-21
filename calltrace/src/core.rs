@@ -28,14 +28,26 @@ macro_rules! cvt_cex_print_tag {
 
 #[macro_export]
 macro_rules! cvt_cex_print_u64 {
+    ($tag: expr $(,)?) => {};
     ($tag: expr, $x: expr) => { unsafe {::calltrace::cvt_calltrace_print_u64_1(stringify!($tag), $x as u64)}};
     ($tag: expr, $x: expr, $y: expr) => { unsafe {::calltrace::cvt_calltrace_print_u64_2(stringify!($tag), $x as u64,$y as u64)}};
-    ($tag: expr, $x: expr, $y: expr, $z: expr) => { unsafe {::calltrace::cvt_calltrace_print_u64_3(stringify!($tag), $x as u64,$y as u64,$z as u64)}};
+    ($tag: expr, $v: expr, $x: expr, $y: expr $(,$z:expr)*) =>
+    {
+	unsafe {::calltrace::cvt_calltrace_print_u64_3(stringify!($tag), $v as u64, $x as u64,$y as u64)};
+	cvt_cex_print_u64!($tag $(,$z)*);
+	() // it needs to return an expression
+    };    
 }
 
 #[macro_export]
 macro_rules! cvt_cex_print_i64 {
+    ($tag: expr $(,)?) => {};
     ($tag: expr, $x: expr) => { unsafe {::calltrace::cvt_calltrace_print_i64_1(stringify!($tag), $x as i64)}};
     ($tag: expr, $x: expr, $y: expr) => { unsafe {::calltrace::cvt_calltrace_print_i64_2(stringify!($tag), $x as i64,$y as i64)}};
-    ($tag: expr, $x: expr, $y: expr, $z: expr) => { unsafe {::calltrace::cvt_calltrace_print_i64_3(stringify!($tag), $x as i64,$y as i64,$z as i64)}};
+    ($tag: expr, $v: expr, $x: expr, $y: expr $(,$z:expr)*) =>
+    {
+	unsafe {::calltrace::cvt_calltrace_print_i64_3(stringify!($tag), $v as i64, $x as i64,$y as i64)};
+	cvt_cex_print_i64!($tag $(,$z)*);
+	() // it needs to return an expression
+    };    
 }
