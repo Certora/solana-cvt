@@ -4,9 +4,7 @@ use core::mem;
 use std::{ptr, ops::{Deref, DerefMut, Index, IndexMut}};
 use alloc::alloc::{Layout, alloc, dealloc};
 use nondet::Nondet;
-use std::io::Read;
-use anchor_lang::prelude::borsh::maybestd::io::Write;
-use anchor_lang::{AnchorSerialize, AnchorDeserialize};
+use std::io::{Read, Write, Result};
 use borsh::{BorshDeserialize, BorshSerialize};
 
 /////////////////////////
@@ -224,51 +222,28 @@ impl<T> IndexMut<usize> for NoResizableVec<T> {
     }
 }
 
-impl<T: AnchorSerialize> BorshSerialize for NoResizableVec<T> {
-    fn serialize<W: Write>(&self, writer: &mut W) -> borsh::maybestd::io::Result<()> {
-        let len = usize::try_from(self.len()).map_err(|_| std::io::ErrorKind::InvalidInput)?;
-        writer.write_all(&len.to_le_bytes())?;
 
-        let cap = usize::try_from(self.buf.cap).map_err(|_| std::io::ErrorKind::InvalidInput)?;
-        writer.write_all(&cap.to_le_bytes())?;
 
-        // serialize the vector
-        unsafe {
-            let slice = core::slice::from_raw_parts(self.buf.ptr.as_ptr(), self.len);
-            slice.serialize(writer)
-        }
+impl<T> borsh::BorshSerialize for NoResizableVec<T>
+    where T: BorshSerialize, {
+    // Not implemented
+    fn serialize<W: Write>(&self, writer: &mut W) -> Result<()> {
+        cvt::cvt_assert!(false);
+	Ok(())
     }
 }
 
-/// We need to fix the capacity of the vector.
-/// However, this number depends on the specific verification task.
-impl<T:Nondet + AnchorDeserialize> BorshDeserialize for NoResizableVec<T> {
-    fn deserialize(buf: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
-        // Deserialize the len and capacity
-        let len = usize::deserialize(buf)?;
-        let capacity = usize::deserialize(buf)?;
-
-        // Currently, we don't rely on serialization / deserialization of
-        // the vector elements for verification tasks.
-        // So, we can just create a nondet vector of same len and capacity
-        let mut vec = NoResizableVec::<T>::new(capacity);
-        vec.len = len;
-
-        Ok(vec)
+impl<T> BorshDeserialize for NoResizableVec<T> {
+    // Not implemented
+    fn deserialize(buf: &mut &[u8]) -> Result<Self> {
+        cvt::cvt_assert!(false);
+        panic!();
     }
 
-    fn deserialize_reader<R: Read>(reader: &mut R) -> std::io::Result<Self> {
-        // Deserialize the len and capacity
-        let len = usize::deserialize_reader(reader)?;
-        let capacity = usize::deserialize_reader(reader)?;
-
-        // Currently, we don't rely on serialization / deserialization of
-        // the vector elements for verification tasks.
-        // So, we can just create a nondet vector of same len and capacity
-        let mut vec = NoResizableVec::<T>::new(capacity);
-        vec.len = len;
-
-        Ok(vec)
+    // Not implemented
+    fn deserialize_reader<R: Read>(reader: &mut R) -> Result<Self> {
+        cvt::cvt_assert!(false);
+        panic!();
     }
 }
 
