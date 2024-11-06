@@ -1,7 +1,12 @@
 /// Summaries for Token and Token-2022
 ///
 use arrayref::{array_mut_ref, array_ref, array_refs, mut_array_refs};
-use solana_program::{account_info::AccountInfo, entrypoint::ProgramResult};
+use solana_program::{
+    account_info::AccountInfo,
+    entrypoint::ProgramResult,
+    program_error::ProgramError,
+    program_error::ProgramError::InvalidArgument,
+};
 
 /// Unpack only amount from account [info] base
 pub fn spl_token_account_get_amount(info: &AccountInfo) -> u64 {
@@ -142,12 +147,22 @@ pub fn spl_burn<'a> (
     Ok(())
 }
 
-/// Same as spl_burn, but sings with withdraw_ticket PDA
-pub fn spl_burn_withdraw_ticket<'a> (
-    mint_info: &AccountInfo<'a>,
+/// Summary for SPL Token close_account instruction
+pub fn spl_close_account<'a> (
     src_info: &AccountInfo<'a>,
-    authority: &AccountInfo<'a>,
-    amount: u64
+    dst_info: &AccountInfo<'a>,
+    authority_info: &AccountInfo<'a>
 ) -> ProgramResult {
-    spl_burn(mint_info, src_info, authority, amount)
-}
+    if src_info.key != dst_info.key {
+        return Err(ProgramError::InvalidAccountData)
+    }
+
+    let src_amount = spl_token_account_get_amount(src_info);
+
+    if src_amount != 0 {
+        // The error code in SPL Token 2022 is TokenError::NonNativeHasBalance
+        return Err(ProgramError::InvalidAccountData);
+    }
+
+    Ok(())
+}    
