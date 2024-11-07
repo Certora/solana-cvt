@@ -3,16 +3,16 @@ use quote::quote;
 use syn::{parse_macro_input, parse_quote, ItemFn};
 
 
-/// Mark a method as a CVT rule
+/// Mark a method as a CERTORA rule
 ///
 /// # Example
 ///
 /// ```
-/// use cvt_macros::rule;
-/// use cvt::CVT_assert;
+/// use certora_macros::rule;
+/// use cvt::CERTORA_assert;
 /// #[rule]
 /// fn foo()  {
-///    cvt::CVT_assert(false);
+///    cvt::CERTORA_assert(false);
 /// }
 /// ```
 #[proc_macro_attribute]

@@ -1,4 +1,4 @@
 #![no_std]
-pub mod cvt_stubs;
+pub mod certora_stubs;
 #[cfg(feature = "solana")]
 pub mod solana_stubs;

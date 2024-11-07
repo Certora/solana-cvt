@@ -163,7 +163,7 @@ fn derive_client_impl(crate_path: &Path, name: &str, fns: &[syn::TraitItemFn]) -
 }
 
 #[proc_macro_attribute]
-pub fn cvt_contractclient(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn certora_contractclient(attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = match NestedMeta::parse_meta_list(attr.into()) {
         Ok(v) => v,
         Err(e) => {
@@ -207,7 +207,7 @@ fn of_named_fields(n: &Ident, named_fields: &FieldsNamed) -> proc_macro2::TokenS
         .map(|f| {
             let name = f.ident.as_ref().unwrap();
             quote! {
-                #name: ::cvt_soroban::Nondet::nondet(),
+                #name: ::certora_soroban::Nondet::nondet(),
             }
         });
 
@@ -224,7 +224,7 @@ fn of_unnamed_fields(n: &Ident, unnamed: &FieldsUnnamed) -> proc_macro2::TokenSt
         .iter()
         .map(|f| {
             quote! {
-                ::cvt_soroban::Nondet::nondet(),
+                ::certora_soroban::Nondet::nondet(),
             }
         });
 
@@ -252,7 +252,7 @@ pub fn derive_nondet(item: TokenStream) -> TokenStream {
             match (ds.fields) {
                 Fields::Unit => {
                     quote! {
-                        impl ::cvt_soroban::Nondet for #name {
+                        impl ::certora_soroban::Nondet for #name {
                             fn nondet() -> #name {
                                 ()
                             }
@@ -263,7 +263,7 @@ pub fn derive_nondet(item: TokenStream) -> TokenStream {
                 Named(named) => {
                     let init = of_named_fields(&name, &named);
                     quote! {
-                        impl ::cvt_soroban::Nondet for #name {
+                        impl ::certora_soroban::Nondet for #name {
                             fn nondet() -> #name {
                                 #init
                             }
@@ -274,7 +274,7 @@ pub fn derive_nondet(item: TokenStream) -> TokenStream {
                 Unnamed(fields) => {
                     let init = of_unnamed_fields(&name, &fields);
                     quote! {
-                        impl ::cvt_soroban::Nondet for #name {
+                        impl ::certora_soroban::Nondet for #name {
                             fn nondet() -> #name {
                                 #init
                             }

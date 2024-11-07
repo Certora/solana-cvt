@@ -1,5 +1,5 @@
 [package]
-name = "cvt-macros"
+name = "certora-macros"
 version = "0.0.1"
 authors = ["Arie Gurfinkel <arie@certora.com>"]
 edition = "2021"
