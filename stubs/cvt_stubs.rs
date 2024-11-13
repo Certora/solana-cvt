@@ -2,6 +2,7 @@ extern "C" {
     // External assume and assert
     fn CVT_assume_c(_c: bool);
     fn CVT_assert_c(_c: bool);
+    fn CVT_satisfy_c(_c: bool);    
 }
 
 extern "C" {
@@ -32,6 +33,12 @@ pub fn CVT_assume_impl(c: bool) {
 pub fn CVT_assert_impl(c: bool) {
     unsafe {
         CVT_assert_c(c);
+    }
+}
+#[allow(non_snake_case)]
+pub fn CVT_satisfy_impl(c: bool) {
+    unsafe {
+        CVT_satisfy_c(c);
     }
 }
 #[allow(non_snake_case)]
@@ -155,6 +162,11 @@ mod impls {
         assert!(_c);
     }
 
+    #[allow(non_snake_case)]
+    #[no_mangle]
+    extern "C" fn CVT_satisfy_c(_c: bool) {
+    }
+    
     macro_rules! impl_nd {
         ($name:ident, $ty:ident) => {
             #[allow(non_snake_case)]

@@ -14,11 +14,10 @@ pub fn CVT_assert(c: bool){
     cvt_stubs::CVT_assert_impl(c)
 }
 
-#[inline(always)]
+#[inline(never)]
 #[allow(non_snake_case)]
 pub fn CVT_satisfy(c: bool){
-    CVT_assume(c);
-    CVT_assert(false);
+    cvt_stubs::CVT_satisfy_impl(c)
 }
 
 #[inline(never)]
