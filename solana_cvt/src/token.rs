@@ -43,6 +43,16 @@ pub fn spl_mint_get_supply(mint: &AccountInfo) -> u64 {
     return u64::from_le_bytes(*supply);
 }
 
+/// Unpack only decimals from [mint] base
+pub fn spl_mint_get_decimals(mint: &AccountInfo) -> u8 {
+    let data = mint.data.borrow_mut();
+    let src = array_ref![*data, 0, 82];
+    let (_mint_authority, _supply, decimals, _is_initialized, _freeze_authority) =
+        array_refs![src, 36, 8, 1, 1, 36];
+    return decimals[0];
+}
+
+
 /// Pack only [supply] from [mint] base
 pub fn spl_mint_set_supply(supply: u64, mint: &AccountInfo) {
     let mut data = mint.data.borrow_mut();
