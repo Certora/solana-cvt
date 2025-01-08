@@ -5,6 +5,7 @@ extern "C" {
     fn CVT_satisfy_c(_c: bool);    
 }
 
+#[allow(improper_ctypes)]
 extern "C" {
     // Definition of external functions that represent getting arbitrary values
     fn CVT_nondet_u8_c() -> u8;

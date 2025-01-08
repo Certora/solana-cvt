@@ -1,7 +1,8 @@
 #![allow(unused_macros)]
 
-/// Please, don't import directly these functions in your project.
-/// Instead, import only the macros.
+// Please, don't import directly these functions in your project.
+// Instead, import only the macros.
+#[allow(improper_ctypes)]
 extern "C" {
     #[allow(dead_code)]
     pub fn CVT_calltrace_print_tag(tag: &str);

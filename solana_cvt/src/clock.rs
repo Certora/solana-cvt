@@ -23,7 +23,7 @@ pub fn cvt_get_next_clock_slot() -> Slot {
     }
 }
 
-#[allow(non_snake_case)]
+#[allow(non_snake_case,static_mut_refs)]
 #[inline(always)] 
 pub fn cvt_get_clock_slot() -> Slot {
     // need to call at least once cvt_get_next_clock_slot before calling this function

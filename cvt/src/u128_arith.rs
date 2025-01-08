@@ -1,3 +1,4 @@
+#[allow(improper_ctypes)]
 extern "C" {
     fn CVT_u128_leq_c(x: u128, y:u128) -> bool;
     fn CVT_u128_gt0_c(x: u128) -> bool;

@@ -9,4 +9,4 @@ quote = "1.0"
 syn = { version = "2", features = ['derive', 'parsing', 'extra-traits'] }
 
 [lib]
-proc_macro = true
+proc-macro = true

@@ -5,7 +5,6 @@ use solana_program::{
     account_info::AccountInfo,
     entrypoint::ProgramResult,
     program_error::ProgramError,
-    program_error::ProgramError::InvalidArgument,
 };
 
 /// Unpack only amount from account [info] base
@@ -161,7 +160,7 @@ pub fn spl_burn<'a> (
 pub fn spl_close_account<'a> (
     src_info: &AccountInfo<'a>,
     dst_info: &AccountInfo<'a>,
-    authority_info: &AccountInfo<'a>
+    _authority_info: &AccountInfo<'a>
 ) -> ProgramResult {
     if src_info.key != dst_info.key {
         return Err(ProgramError::InvalidAccountData)
