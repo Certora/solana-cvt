@@ -1,4 +1,4 @@
-use soroban_sdk::{Address, Env, TryFromVal, Val, String, Bytes};
+use soroban_sdk::{Address, Env, IntoVal, TryFromVal, Val, String, Bytes, Map};
 
 use crate::{Nondet};
 
@@ -33,5 +33,17 @@ impl Nondet for Bytes {
     fn nondet() -> Self {
         let nondet_u8 = u8::nondet();
         return Bytes::from_slice(&Env::default(), &[nondet_u8]);
+    }
+}
+
+impl <K,V> Nondet for Map<K,V>
+where
+    K: IntoVal<Env, Val> + TryFromVal<Env, Val>,
+    V: IntoVal<Env, Val> + TryFromVal<Env, Val>,
+{
+    fn nondet() -> Self {
+        let v = u64::nondet();
+        let val = Val::from_payload((v << 8) | 76);
+        return Map::try_from_val(&Env::default(), &val).unwrap();
     }
 }
