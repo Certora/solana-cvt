@@ -211,4 +211,11 @@ mod tests {
         assert_eq!(x + y, 6.into());
         assert!(x < 6.into());
     }
+
+    #[test]
+    fn nondet_test() {
+        let x: MathIntU64 = nondet::nondet();
+        assert_eq!(x, 0.into());
+
+    }
 }
