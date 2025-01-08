@@ -5,58 +5,58 @@ mod rt_decls {
     type BoolU64 = u64;
 
     extern "C" {
-        pub fn __CVT_mathint_u64_eq(_: u64, _: u64) -> BoolU64;
-        pub fn __CVT_mathint_u64_lt(_: u64, _: u64) -> BoolU64;
-        pub fn __CVT_mathint_u64_le(_: u64, _: u64) -> BoolU64;
+        pub fn CVT_mathint_u64_eq(_: u64, _: u64) -> BoolU64;
+        pub fn CVT_mathint_u64_lt(_: u64, _: u64) -> BoolU64;
+        pub fn CVT_mathint_u64_le(_: u64, _: u64) -> BoolU64;
 
-        pub fn __CVT_mathint_u64_add(_: u64, _: u64) -> u64;
-        pub fn __CVT_mathint_u64_mul(_: u64, _: u64) -> u64;
-        pub fn __CVT_mathint_u64_div(_: u64, _: u64) -> u64;
-        pub fn __CVT_mathint_u64_div_ceil(_: u64, _: u64) -> u64;
+        pub fn CVT_mathint_u64_add(_: u64, _: u64) -> u64;
+        pub fn CVT_mathint_u64_mul(_: u64, _: u64) -> u64;
+        pub fn CVT_mathint_u64_div(_: u64, _: u64) -> u64;
+        pub fn CVT_mathint_u64_div_ceil(_: u64, _: u64) -> u64;
 
-        pub fn __CVT_mathint_u64_nondet() -> u64;
+        pub fn CVT_mathint_u64_nondet() -> u64;
     }
 }
 
 #[cfg(feature = "rt")]
 mod rt_impls {
     #[no_mangle]
-    pub extern "C" fn __CVT_mathint_u64_eq(a: u64, b: u64) -> u64 {
+    pub extern "C" fn CVT_mathint_u64_eq(a: u64, b: u64) -> u64 {
         (a == b).into()
     }
 
     #[no_mangle]
-    pub extern "C" fn __CVT_mathint_u64_lt(a: u64, b: u64) -> u64 {
+    pub extern "C" fn CVT_mathint_u64_lt(a: u64, b: u64) -> u64 {
         (a < b).into()
     }
 
     #[no_mangle]
-    pub extern "C" fn __CVT_mathint_u64_le(a: u64, b: u64) -> u64 {
+    pub extern "C" fn CVT_mathint_u64_le(a: u64, b: u64) -> u64 {
         (a <= b).into()
     }
 
     #[no_mangle]
-    pub extern "C" fn __CVT_mathint_u64_add(a: u64, b: u64) -> u64 {
+    pub extern "C" fn CVT_mathint_u64_add(a: u64, b: u64) -> u64 {
         a.checked_add(b).unwrap()
     }
 
     #[no_mangle]
-    pub extern "C" fn __CVT_mathint_u64_mul(a: u64, b: u64) -> u64 {
+    pub extern "C" fn CVT_mathint_u64_mul(a: u64, b: u64) -> u64 {
         a.checked_mul(b).unwrap()
     }
 
     #[no_mangle]
-    pub extern "C" fn __CVT_mathint_u64_div(a: u64, b: u64) -> u64 {
+    pub extern "C" fn CVT_mathint_u64_div(a: u64, b: u64) -> u64 {
         a.checked_div(b).unwrap()
     }
 
     #[no_mangle]
-    pub extern "C" fn __CVT_mathint_u64_div_ceil(a: u64, b: u64) -> u64 {
+    pub extern "C" fn CVT_mathint_u64_div_ceil(a: u64, b: u64) -> u64 {
         a.div_ceil(b)
     }
 
     #[no_mangle]
-    pub extern "C" fn __CVT_mathint_u64_nondet() -> u64 {
+    pub extern "C" fn CVT_mathint_u64_nondet() -> u64 {
         /* nondet::nondet() */
         0
     }
@@ -66,13 +66,13 @@ use rt_decls::*;
 
 impl MathIntU64 {
     pub fn div_ceil(self, rhs: Self) -> Self {
-        unsafe { Self(__CVT_mathint_u64_div_ceil(self.0, rhs.0)) }
+        unsafe { Self(CVT_mathint_u64_div_ceil(self.0, rhs.0)) }
     }
 }
 
 impl PartialEq for MathIntU64 {
     fn eq(&self, other: &Self) -> bool {
-        unsafe { __CVT_mathint_u64_eq(self.0, other.0) != 0 }
+        unsafe { CVT_mathint_u64_eq(self.0, other.0) != 0 }
     }
 }
 
@@ -88,10 +88,10 @@ impl PartialOrd for MathIntU64 {
         Some(ord)
     }
     fn lt(&self, other: &MathIntU64) -> bool {
-        unsafe { __CVT_mathint_u64_lt(self.0, other.0) != 0 }
+        unsafe { CVT_mathint_u64_lt(self.0, other.0) != 0 }
     }
     fn le(&self, other: &MathIntU64) -> bool {
-        unsafe { __CVT_mathint_u64_le(self.0, other.0) != 0 }
+        unsafe { CVT_mathint_u64_le(self.0, other.0) != 0 }
     }
     fn gt(&self, other: &MathIntU64) -> bool {
         other.lt(self)
@@ -143,7 +143,7 @@ impl std::ops::Add<MathIntU64> for MathIntU64 {
     type Output = Self;
 
     fn add(self, rhs: MathIntU64) -> Self::Output {
-        unsafe { Self(__CVT_mathint_u64_add(self.0, rhs.0)) }
+        unsafe { Self(CVT_mathint_u64_add(self.0, rhs.0)) }
     }
 }
 
@@ -151,7 +151,7 @@ impl std::ops::Mul<MathIntU64> for MathIntU64 {
     type Output = Self;
 
     fn mul(self, rhs: MathIntU64) -> Self::Output {
-        unsafe { Self(__CVT_mathint_u64_mul(self.0, rhs.0)) }
+        unsafe { Self(CVT_mathint_u64_mul(self.0, rhs.0)) }
     }
 }
 
@@ -159,7 +159,7 @@ impl std::ops::Div<MathIntU64> for MathIntU64 {
     type Output = Self;
 
     fn div(self, rhs: MathIntU64) -> Self::Output {
-        unsafe { Self(__CVT_mathint_u64_div(self.0, rhs.0)) }
+        unsafe { Self(CVT_mathint_u64_div(self.0, rhs.0)) }
     }
 }
 
@@ -195,7 +195,7 @@ impl From<u64> for MathIntU64 {
 
 impl nondet::Nondet for MathIntU64 {
     fn nondet() -> MathIntU64 {
-        unsafe { Self(__CVT_mathint_u64_nondet()) }
+        unsafe { Self(CVT_mathint_u64_nondet()) }
     }
 }
 
