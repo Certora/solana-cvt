@@ -10,7 +10,7 @@ soroban = ["dep:soroban-sdk"]
 std = []
 
 [dependencies]
-soroban-sdk = { version = ">=20.5.0", optional = true}
+soroban-sdk = { version = ">=20.5.0", optional=true}
 solana-program = {version = "1.14.10", optional=true}
 certora = { path = "../certora" }
 stubs = { path = "../stubs" }
