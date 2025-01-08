@@ -1,6 +1,14 @@
 #[derive(Eq, Debug, Copy, Clone)]
+/// Mathematical Integer (represented by u64 number)
+/// 
+/// The magic is that symbolically an SBF word is mapped to 256 bit symbolic
+/// integer. 
 pub struct MathIntU64(u64);
 
+/// Declaration for external library for mathematical integers
+/// 
+/// This library is implemented symbolically by Certora Prover
+/// Run-time under-approximation is provided in [rt_impls] module
 mod rt_decls {
     type BoolU64 = u64;
 
@@ -18,6 +26,10 @@ mod rt_decls {
     }
 }
 
+/// Run-time implementation of the external library
+/// 
+/// This implementation is intendent as an under-approximation of the symbolic
+/// behaviour. It is intended to be used for testing.
 #[cfg(feature = "rt")]
 mod rt_impls {
     #[no_mangle]
@@ -57,7 +69,9 @@ mod rt_impls {
 
     #[no_mangle]
     pub extern "C" fn CVT_mathint_u64_nondet() -> u64 {
-        /* nondet::nondet() */
+        // -- concrete implementation returns some specific number
+        // -- it can, potentially, return a random number instead, or depend on
+        // -- run-time of nondet
         0
     }
 }
@@ -67,6 +81,10 @@ use rt_decls::*;
 impl MathIntU64 {
     pub fn div_ceil(self, rhs: Self) -> Self {
         unsafe { Self(CVT_mathint_u64_div_ceil(self.0, rhs.0)) }
+    }
+
+    pub fn nondet() -> MathIntU64 {
+        nondet::nondet()
     }
 }
 
@@ -193,7 +211,7 @@ impl From<u64> for MathIntU64 {
     }
 }
 
-impl nondet::Nondet for MathIntU64 {
+impl ::nondet::Nondet for MathIntU64 {
     fn nondet() -> MathIntU64 {
         unsafe { Self(CVT_mathint_u64_nondet()) }
     }
@@ -216,6 +234,5 @@ mod tests {
     fn nondet_test() {
         let x: MathIntU64 = nondet::nondet();
         assert_eq!(x, 0.into());
-
     }
 }
