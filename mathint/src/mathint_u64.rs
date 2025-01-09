@@ -171,6 +171,11 @@ impl MathIntU64 {
     pub fn nondet() -> Self {
         nondet::nondet()
     }
+
+    // Expose internal representation. Internal use only.
+    pub fn as_internal(&self) -> u64 { 
+        self.0
+    }
 }
 
 impl PartialEq for MathIntU64 {
@@ -330,6 +335,14 @@ impl From<&[u8; 32]> for MathIntU64 {
     }
 }
 
+impl From<&[u8]> for MathIntU64 {
+    fn from(value: &[u8]) -> Self {
+        let v: &[u8; 32] = value.try_into().unwrap();
+        Self::from(v)
+    }
+
+}
+
 impl ::nondet::Nondet for MathIntU64 {
     fn nondet() -> MathIntU64 {
         unsafe { Self(CVT_mathint_u64_nondet()) }
@@ -345,13 +358,13 @@ mod tests {
         let x = MathIntU64(2);
         let y = MathIntU64(4);
         assert_eq!(x + y, MathIntU64(6));
-        assert_eq!(x + y, 6.into());
-        assert!(x < 6.into());
+        assert_eq!(x + y, 6u64.into());
+        assert!(x < 6u64.into());
     }
 
     #[test]
     fn nondet_test() {
         let x: MathIntU64 = nondet::nondet();
-        assert_eq!(x, 0.into());
+        assert_eq!(x, 0u64.into());
     }
 }
