@@ -6,6 +6,7 @@ use alloc::alloc::{Layout, alloc, dealloc};
 use nondet::Nondet;
 use std::io::{Read, Write, Result};
 use borsh::{BorshDeserialize, BorshSerialize};
+use cvt::cvt_assert;
 
 /////////////////////////
 /// Raw Vec
@@ -82,7 +83,7 @@ impl<T> NoResizableVec<T> {
     }
 
     pub fn push(&mut self, value: T) {
-        assert!(self.buf.cap > self.len);
+        cvt_assert!(self.buf.cap > self.len);
         unsafe {
             let end: *mut T = self.buf.ptr.as_ptr().add(self.len);
             end.write(value);
@@ -103,8 +104,8 @@ impl<T> NoResizableVec<T> {
     }
 
     pub fn insert(&mut self, index: usize, value: T) {
-        assert!(self.buf.cap > self.len);
-        assert!(index <= self.len);
+        cvt_assert!(self.buf.cap > self.len);
+        cvt_assert!(index <= self.len);
         unsafe {
             let ptr: *mut T = self.buf.ptr.as_ptr().add(index);
             ptr.copy_to(ptr.add(1), self.len - index);
@@ -114,7 +115,7 @@ impl<T> NoResizableVec<T> {
     }
 
     pub fn remove(&mut self, index: usize) -> T {
-        assert!(index < self.len);
+        cvt_assert!(index < self.len);
         unsafe {
             self.len -= 1;
             let ptr: *mut T = self.buf.ptr.as_ptr().add(index);
@@ -198,7 +199,7 @@ impl<T> Index<usize> for NoResizableVec<T> {
     type Output = T;
 
     fn index(&self, index: usize) -> &T {
-        assert!(index < self.len());
+        cvt_assert!(index < self.len());
         unsafe {
             if mem::size_of::<T>() == 0 {
                 NonNull::<T>::dangling().as_ref()
@@ -211,7 +212,7 @@ impl<T> Index<usize> for NoResizableVec<T> {
 
 impl<T> IndexMut<usize> for NoResizableVec<T> {
     fn index_mut(&mut self, index: usize) -> &mut T {
-        assert!(index < self.len());
+        cvt_assert!(index < self.len());
         unsafe {
             if mem::size_of::<T>() == 0 {
                 NonNull::<T>::dangling().as_mut()
@@ -228,22 +229,22 @@ impl<T> borsh::BorshSerialize for NoResizableVec<T>
     where T: BorshSerialize, {
     // Not implemented
     fn serialize<W: Write>(&self, writer: &mut W) -> Result<()> {
-        cvt::cvt_assert!(false);
-	Ok(())
+        cvt_assert!(false);
+        unreachable!();
     }
 }
 
 impl<T> BorshDeserialize for NoResizableVec<T> {
     // Not implemented
     fn deserialize(buf: &mut &[u8]) -> Result<Self> {
-        cvt::cvt_assert!(false);
-        panic!();
+        cvt_assert!(false);
+        unreachable!();
     }
 
     // Not implemented
     fn deserialize_reader<R: Read>(reader: &mut R) -> Result<Self> {
-        cvt::cvt_assert!(false);
-        panic!();
+        cvt_assert!(false);
+        unreachable!();
     }
 }
 
@@ -335,7 +336,7 @@ macro_rules! cvt_no_resizable_vec {
     ([$($values:expr),* $(,)?]; $cap:expr) => {
         {
             let ARG_COUNT: usize = 0 $(+ { _ = $values; 1 })*;
-            assert!(ARG_COUNT <= $cap);
+            cvt::cvt_assert!(ARG_COUNT <= $cap);
             let mut v = vectors::no_resizable_vec::NoResizableVec::new($cap);
             $(v.push($values);)*
             v
