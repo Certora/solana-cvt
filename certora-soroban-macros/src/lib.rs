@@ -6,12 +6,9 @@ use uuid::Uuid;
 use syn::{
     parse_macro_input,
     parse_str,
-    Data::{self, Struct, Union, Enum},
+    Data::{Struct, Union, Enum},
     DeriveInput,
-    Field,
     Ident,
-    ItemStruct,
-    Member,
     Fields::{self, Named, Unnamed},
     FieldsNamed,
     FieldsUnnamed,
@@ -36,8 +33,6 @@ struct ContractClientArgs {
     #[darling(default = "default_crate_path")]
     crate_path: Path,
     name: String,
-    #[darling(default)]
-    impl_only: bool,
 }
 
 fn non_env_inputs(f: &syn::TraitItemFn) -> (Vec<Ident>, Vec<FnArg>) {
@@ -207,7 +202,7 @@ fn of_named_fields(n: &Ident, named_fields: &FieldsNamed) -> proc_macro2::TokenS
         .map(|f| {
             let name = f.ident.as_ref().unwrap();
             quote! {
-                #name: ::certora_soroban::Nondet::nondet(),
+                #name: ::nondet::Nondet::nondet(),
             }
         });
 
@@ -222,9 +217,9 @@ fn of_unnamed_fields(n: &Ident, unnamed: &FieldsUnnamed) -> proc_macro2::TokenSt
     let initialize = unnamed
         .unnamed
         .iter()
-        .map(|f| {
+        .map(|_| {
             quote! {
-                ::certora_soroban::Nondet::nondet(),
+                ::nondet::Nondet::nondet(),
             }
         });
 
@@ -240,19 +235,19 @@ pub fn derive_nondet(item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as DeriveInput);
     let name = input.ident;
     match input.data {
-        Enum(e) => {
+        Enum(_) => {
             todo!("Enum not supported yet")
         },
 
-        Union(u) => {
+        Union(_) => {
             todo!("Union not supported yet")
         },
 
         Struct(ds) => {
-            match (ds.fields) {
+            match ds.fields {
                 Fields::Unit => {
                     quote! {
-                        impl ::certora_soroban::Nondet for #name {
+                        impl ::nondet::Nondet for #name {
                             fn nondet() -> #name {
                                 ()
                             }
@@ -263,7 +258,7 @@ pub fn derive_nondet(item: TokenStream) -> TokenStream {
                 Named(named) => {
                     let init = of_named_fields(&name, &named);
                     quote! {
-                        impl ::certora_soroban::Nondet for #name {
+                        impl ::nondet::Nondet for #name {
                             fn nondet() -> #name {
                                 #init
                             }
@@ -274,7 +269,7 @@ pub fn derive_nondet(item: TokenStream) -> TokenStream {
                 Unnamed(fields) => {
                     let init = of_unnamed_fields(&name, &fields);
                     quote! {
-                        impl ::certora_soroban::Nondet for #name {
+                        impl ::nondet::Nondet for #name {
                             fn nondet() -> #name {
                                 #init
                             }
@@ -300,7 +295,6 @@ impl Parse for Idents {
 
 #[proc_macro]
 pub fn declare_rules(input: TokenStream) -> TokenStream {
-    let clone = input.clone();
     let x = parse_macro_input!(input as Idents);
     let rules = x.idents.iter()
                         .flat_map(|i| format!("{}\0", i.to_string()).into_bytes()).collect::<Vec<u8>>();
@@ -313,15 +307,15 @@ pub fn declare_rules(input: TokenStream) -> TokenStream {
         pub static #rule_set_name: [u8; #rule_size] = *#rule_lit;
     }.into()
 }
-
 #[proc_macro_attribute]
 pub fn rule(_attr: TokenStream, input: TokenStream) -> TokenStream {
-    let fnItem = parse_macro_input!(input as syn::ItemFn);
-    let rule_name = format_ident!("{}", &fnItem.sig.ident);
+    extern crate self as us;
+    let fn_item = parse_macro_input!(input as syn::ItemFn);
+    let rule_name = format_ident!("{}", &fn_item.sig.ident);
 
     quote!{
-        declare_rules!(#rule_name);
+        certora_soroban_macros::declare_rules!(#rule_name);
         #[no_mangle]
-        #fnItem
+        #fn_item
     }.into()
 }
