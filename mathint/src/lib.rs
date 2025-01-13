@@ -1,10 +1,12 @@
 /// ! Mathematical Integers
 /// 
 /// This crate provides various representations of integers that behave like
-/// mathematical integers that do not overflow. The functionality is exposed via
-/// [MathInt] type.
+/// mathematical integers that do not overflow. /// 
+/// 
+/// [NativeInt] is a native symbolic integer of the Certora Prover. Typically,
+/// this is a 256 bit integer.
 /// 
 /// Use feature `rt` to enable run-time under-approximation, for example, for testing.
-pub mod mathint_u64;
+pub mod nativeint_u64;
 
-pub use mathint_u64::MathIntU64 as MathInt;
+pub use nativeint_u64::NativeIntU64 as NativeInt;
