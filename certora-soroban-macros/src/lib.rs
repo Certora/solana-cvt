@@ -307,68 +307,6 @@ pub fn declare_rules(input: TokenStream) -> TokenStream {
         pub static #rule_set_name: [u8; #rule_size] = *#rule_lit;
     }.into()
 }
-
-struct SummaryRow {
-    f: Path,
-    _p1: Token![=],
-    _p2: Token![>],
-    g: Path,
-}
-
-impl Parse for SummaryRow {
-    fn parse(input: ParseStream) -> syn::parse::Result<Self> {
-        Ok(SummaryRow{
-            f: input.parse()?,
-            _p1:input.parse()?,
-            _p2: input.parse()?,
-            g: input.parse()?,
-        })
-    }
-}
-
-struct Summaries {
-    summaries: Punctuated<SummaryRow, Comma>
-}
-
-impl Parse for Summaries {
-    fn parse(input: ParseStream) -> syn::parse::Result<Self> {
-        Ok(Summaries{
-            summaries: input.parse_terminated(SummaryRow::parse, Token![,])?
-        })
-    }
-}
-
-fn path_str(p: &Path) -> String {
-    println!("Path?? {:?}", p.segments);
-    let mut s = String::new();
-    for seg in p.segments.iter() {
-        println!("goooo {}", s);
-        s.push_str("::");
-        s.push_str(&seg.ident.to_string());
-    }
-    s
-}
-
-#[proc_macro]
-pub fn declare_summaries(input: TokenStream) -> TokenStream {
-    let x = parse_macro_input!(input as Summaries);
-    let table = x.summaries
-                 .iter()
-                 .flat_map(|r|
-                    format!("{}|{}\0",
-                            path_str(&r.f),
-                            path_str(&r.g)).into_bytes()
-                 ).collect::<Vec<u8>>();
-    let table_lit = proc_macro2::Literal::byte_string(table.as_slice());
-    let table_size: usize = table.len();
-    let table_name = format_ident!("{}", format!("SUMMARIES_{}", Uuid::new_v4().simple()));
-
-    quote! {
-        #[cfg_attr(target_family = "wasm", link_section = "certora_summaries")]
-        pub static #table_name: [u8; #table_size] = *#table_lit;
-    }.into()
-}
-
 #[proc_macro_attribute]
 pub fn rule(_attr: TokenStream, input: TokenStream) -> TokenStream {
     extern crate self as us;
