@@ -218,8 +218,6 @@ pub mod borsh0_9 {
     use super::*;
 
     impl<T> ::borsh0_9::BorshSerialize for NoResizableVec<T>
-    where
-        T: ::borsh0_9::BorshSerialize,
     {
         // Not implemented
         fn serialize<W: Write>(&self, _writer: &mut W) -> Result<()> {
@@ -229,8 +227,6 @@ pub mod borsh0_9 {
     }
 
     impl<T> ::borsh0_9::BorshDeserialize for NoResizableVec<T>
-    where
-        T: ::borsh0_9::BorshDeserialize,
     {
         // Not implemented
         fn deserialize(_buf: &mut &[u8]) -> Result<Self> {
@@ -244,8 +240,6 @@ pub mod borsh0_10 {
     use super::*;
 
     impl<T> ::borsh0_10::BorshSerialize for NoResizableVec<T>
-    where
-        T: ::borsh0_10::BorshSerialize,
     {
         // Not implemented
         fn serialize<W: Write>(&self, _writer: &mut W) -> Result<()> {
@@ -255,8 +249,6 @@ pub mod borsh0_10 {
     }
 
     impl<T> ::borsh0_10::BorshDeserialize for NoResizableVec<T>
-    where
-        T: ::borsh0_10::BorshDeserialize,
     {
         // Not implemented
         fn deserialize(_buf: &mut &[u8]) -> Result<Self> {
