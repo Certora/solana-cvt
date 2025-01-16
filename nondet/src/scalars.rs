@@ -21,6 +21,7 @@ mod rt_decls {
     }
 }
 
+#[cfg(feature = "rt")]
 #[allow(improper_ctypes_definitions)]
 mod rt_impls {
     macro_rules! impl_rt_fn {
