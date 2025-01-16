@@ -5,6 +5,8 @@ authors = ["Jorge Navas <jorge@certora.com>"]
 edition = "2021"
 publish = false
 
+[features]
+rt = []
 
 [dependencies]
 cvt = { path = "../cvt" }
