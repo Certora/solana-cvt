@@ -1,12 +1,17 @@
 [package]
 name = "cvt"
-version = "0.2.0"
+version.workspace = true
 edition = "2021"
 
 
 [features]
-vacuity = []
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+vacuity = ["cvlr-asserts/vacuity"]
+rt = ["cvlr-asserts/rt", "cvlr-mathint/rt", "cvlr-log/rt", "cvlr-nondet/rt"]
 
 [dependencies]
-stubs = { path = "../stubs" }
+cvlr-asserts = { workspace = true }
+cvlr-mathint = { workspace = true }
+cvlr-log = { workspace = true }
+cvlr-nondet = { workspace = true }
+cvlr-macros = { workspace = true }
+cvlr-early-panic = { workspace = true }

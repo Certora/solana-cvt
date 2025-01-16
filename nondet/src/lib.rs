@@ -16,6 +16,7 @@ mod solana;
 pub mod spl_token;
 
 pub use crate::core::*;
+pub use scalars::*;
 
 #[cfg(feature = "std")]
 pub use aggregates::*;

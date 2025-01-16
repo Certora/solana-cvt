@@ -3,7 +3,6 @@
 use crate::{nondet, Nondet};
 
 use solana_program::{account_info::AccountInfo, pubkey::Pubkey};
-use stubs::solana_stubs;
 
 impl<T: Nondet> Nondet for solana_program::program_option::COption<T> {
     fn nondet() -> Self {
@@ -15,22 +14,54 @@ impl<T: Nondet> Nondet for solana_program::program_option::COption<T> {
     }
 }
 
+mod rt_decls {
+    use solana_program::{account_info::AccountInfo, pubkey::Pubkey};
+    #[allow(improper_ctypes)]
+    extern "C" {
+        pub fn mk_account_info_unchecked() -> AccountInfo<'static>;
+        pub fn mk_pubkey_unchecked() -> Pubkey;
+    }
+}
+
+#[cfg(feature = "std")]
+#[cfg(feature = "rt")]
+mod rt_impls {
+    use std::boxed::Box;
+    use solana_program::{account_info::AccountInfo, pubkey::Pubkey};
+    use solana_sdk::account::Account;
+
+
+    #[allow(improper_ctypes,improper_ctypes_definitions)]
+    #[no_mangle]
+    extern "C" fn mk_account_info_unchecked() -> AccountInfo<'static> {
+        let owner : &'static mut _ = Box::leak(Box::new(Pubkey::new_unique()));
+        let acc = Account::new(1, 2, &owner);
+        let pk : &'static mut _ = Box::leak(Box::new(Pubkey::new_unique()));
+        let v : &'static mut _ = Box::leak(Box::new((*pk, acc)));
+        v.into()
+
+    }
+    #[no_mangle]
+    pub extern "C" fn mk_pubkey_unchecked() -> Pubkey {
+        Pubkey::default()
+    }
+
+}
+
 #[inline(never)]
 #[allow(non_snake_case)]
 pub fn CVT_nondet_account_info() -> AccountInfo<'static> {
-    solana_stubs::CVT_nondet_account_info_impl()
+    unsafe { rt_decls::mk_account_info_unchecked() }
 }
 
 #[inline(never)]
 #[allow(non_snake_case)]
 pub fn CVT_nondet_pubkey() -> Pubkey {
-    solana_stubs::CVT_nondet_pubkey_impl()
+    unsafe { rt_decls::mk_pubkey_unchecked() }
 }
 
-// E0117: need to implenet Nondet for Pubkey and AccountInfo here instead of solana/src/lib.rs
-// because we can only implement a trait for an arbitrary type in the crate where the trait is defined
-crate::nondet_impl! {Pubkey, CVT_nondet_pubkey(), "Nondet for Pubkey" }
-crate::nondet_impl! {AccountInfo<'static>, CVT_nondet_account_info(), "Nondet for AccountInfo" }
+crate::nondet_impl! { Pubkey, CVT_nondet_pubkey(), "Nondet for Pubkey" }
+crate::nondet_impl! { AccountInfo<'static>, CVT_nondet_account_info(), "Nondet for AccountInfo" }
 
 /**
 
@@ -72,9 +103,9 @@ address in the SVM (Solana Virtual Machine).
 /// Memory layout of AccountInfo field `data` as `Rc<RefCell<&[u8]>>`
 macro_rules! mem_layout_rc_data {
     ($acc_info: expr, $start_addr: expr, $num_acc: expr) => {{
-         // We need the start of the Rc. The method as_ptr() returns the address of &[u8]
-        let data_rc = unsafe {$acc_info.data.as_ptr().offset(-24)} as *const _;
-        cvt::CVT_assume(data_rc == ($start_addr + (512*$num_acc)) as *const _);
+        // We need the start of the Rc. The method as_ptr() returns the address of &[u8]
+        let data_rc = unsafe { $acc_info.data.as_ptr().offset(-24) } as *const _;
+        cvlr_asserts::cvlr_assume!(data_rc == ($start_addr + (512 * $num_acc)) as *const _);
     }};
 }
 
@@ -83,16 +114,16 @@ macro_rules! mem_layout_data {
     ($acc_info_prev: expr, $acc_info: expr, $data_sz: expr) => {{
         let prev_data_ptr = $acc_info_prev.data.borrow().as_ptr();
         let data_ptr = $acc_info.data.borrow().as_ptr();
-        cvt::CVT_assume((prev_data_ptr as usize + $data_sz) as *const u8 == data_ptr);
+        cvlr_asserts::cvlr_assume!((prev_data_ptr as usize + $data_sz) as *const u8 == data_ptr);
     }};
 }
 
 /// Memory layout of AccountInfo field `lamports` as `Rc<RefCell<&u64>>`
 macro_rules! mem_layout_rc_lamport {
     ($acc_info: expr, $start_addr: expr, $num_acc: expr) => {{
-         // We need the start of the Rc. The method as_ptr() returns the address of T
-        let lamports_rc = unsafe {$acc_info.lamports.as_ptr().offset(-24)} as *const _;
-        cvt::CVT_assume(lamports_rc == ($start_addr + (64*$num_acc)) as *const _);
+        // We need the start of the Rc. The method as_ptr() returns the address of T
+        let lamports_rc = unsafe { $acc_info.lamports.as_ptr().offset(-24) } as *const _;
+        cvlr_asserts::cvlr_assume!(lamports_rc == ($start_addr + (64 * $num_acc)) as *const _);
     }};
 }
 
@@ -101,7 +132,9 @@ macro_rules! mem_layout_lamport {
     ($acc_info_prev: expr, $acc_info: expr, $data_sz: expr) => {{
         let prev_lamports_ptr = *$acc_info_prev.lamports.borrow() as *const u64;
         let lamports_ptr = *$acc_info.lamports.borrow() as *const u64;
-        cvt::CVT_assume((prev_lamports_ptr as usize + $data_sz) as *const u64 == lamports_ptr);
+        cvlr_asserts::cvlr_assume!(
+            (prev_lamports_ptr as usize + $data_sz) as *const u64 == lamports_ptr
+        );
     }};
 }
 
@@ -109,7 +142,7 @@ macro_rules! mem_layout_lamport {
 macro_rules! mem_layout_key {
     ($acc_info: expr, $start_addr: expr, $num_acc: expr) => {{
         let key_ptr = &*$acc_info.key as *const _;
-        cvt::CVT_assume(key_ptr as usize == $start_addr + (64*$num_acc));
+        cvlr_asserts::cvlr_assume!(key_ptr as usize == $start_addr + (64 * $num_acc));
     }};
 }
 
@@ -117,7 +150,7 @@ macro_rules! mem_layout_key {
 macro_rules! mem_layout_owner {
     ($acc_info: expr, $start_addr: expr, $num_acc: expr) => {{
         let owner_ptr = &*$acc_info.owner as *const _;
-        cvt::CVT_assume(owner_ptr as usize == $start_addr + (64*$num_acc));
+        cvlr_asserts::cvlr_assume!(owner_ptr as usize == $start_addr + (64 * $num_acc));
     }};
 }
 
@@ -148,7 +181,7 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
      *
      *   For convenience, we arrange them differently. First all the data fields, then all the lamport fields, and so on.
      *
-     * 
+     *
      *               16                               16                                   16                 16                 16              16
      *   data &[u8] ... data &[u8] | lamports Rc  ... lamports Rc | lamports &u64 ... lamports &u64 | data Rc ... data Rc  | key ... key   | owner ... owner
      *    ^                           ^                              ^                                 ^                      ^               ^
@@ -156,16 +189,16 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
      *           
      *   <----  16*0xA00_008 -----><----------  16*64=0x400 ------><------------ 16*8=0x80----------><----16*512=0x2000----><-----0x400---><-----0x400----->
      *
-    **/
+     **/
     {
         /// layout of data &[u8]
-	// The actual address is 0x400_000_000 and it's the start of the context memory region in SVM
-        let start_addr: u64 = 0x400_000_008; 
+        // The actual address is 0x400_000_000 and it's the start of the context memory region in SVM
+        let start_addr: u64 = 0x400_000_008;
         // each account has size of 10MB: 10485760  (0xA00_000). We add 8 just to be conservative.
         let data_sz: usize = 10485760 + 8;
 
         let acc1_data_ptr = acc1.data.borrow().as_ptr();
-        cvt::CVT_assume(acc1_data_ptr  == start_addr as *const u8);
+        cvlr_asserts::cvlr_assume!(acc1_data_ptr == start_addr as *const u8);
         mem_layout_data!(acc1, acc2, data_sz);
         mem_layout_data!(acc2, acc3, data_sz);
         mem_layout_data!(acc3, acc4, data_sz);
@@ -182,8 +215,9 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
         mem_layout_data!(acc14, acc15, data_sz);
         mem_layout_data!(acc15, acc16, data_sz);
     }
-    {   /// layout of lamports Rc<RefCell<T>>
-        let start_addr:usize = 0x40A_000_080;
+    {
+        /// layout of lamports Rc<RefCell<T>>
+        let start_addr: usize = 0x40A_000_080;
         mem_layout_rc_lamport!(acc1, start_addr, 0);
         mem_layout_rc_lamport!(acc2, start_addr, 1);
         mem_layout_rc_lamport!(acc3, start_addr, 2);
@@ -203,9 +237,9 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
     }
     {
         /// layout of lamports
-        let start_addr:usize = 0x40A_000_480;
+        let start_addr: usize = 0x40A_000_480;
         let acc1_lamports_ptr = *acc1.lamports.borrow() as *const u64;
-        cvt::CVT_assume(acc1_lamports_ptr  == start_addr as *const u64);
+        cvlr_asserts::cvlr_assume!(acc1_lamports_ptr == start_addr as *const u64);
 
         mem_layout_lamport!(acc1, acc2, 8);
         mem_layout_lamport!(acc2, acc3, 8);
@@ -223,8 +257,9 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
         mem_layout_lamport!(acc14, acc15, 8);
         mem_layout_lamport!(acc15, acc16, 8);
     }
-    {   /// layout of data Rc<RefCell<...>>
-        let start_addr:usize = 0x40A_000_500;
+    {
+        /// layout of data Rc<RefCell<...>>
+        let start_addr: usize = 0x40A_000_500;
         mem_layout_rc_data!(acc1, start_addr, 0);
         mem_layout_rc_data!(acc2, start_addr, 1);
         mem_layout_rc_data!(acc3, start_addr, 2);
@@ -241,11 +276,10 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
         mem_layout_rc_data!(acc14, start_addr, 13);
         mem_layout_rc_data!(acc15, start_addr, 14);
         mem_layout_rc_data!(acc16, start_addr, 15);
-
     }
     {
         /// layout of key
-        let start_addr:usize = 0x40A_002_500;
+        let start_addr: usize = 0x40A_002_500;
         mem_layout_key!(acc1, start_addr, 0);
         mem_layout_key!(acc2, start_addr, 1);
         mem_layout_key!(acc3, start_addr, 2);
@@ -262,11 +296,10 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
         mem_layout_key!(acc14, start_addr, 13);
         mem_layout_key!(acc15, start_addr, 14);
         mem_layout_key!(acc16, start_addr, 15);
-
     }
     {
         /// layout of owner
-        let start_addr:usize = 0x40A_002_900;
+        let start_addr: usize = 0x40A_002_900;
         mem_layout_owner!(acc1, start_addr, 0);
         mem_layout_owner!(acc2, start_addr, 1);
         mem_layout_owner!(acc3, start_addr, 2);
@@ -285,10 +318,15 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
         mem_layout_owner!(acc16, start_addr, 15);
     }
 
-    return [acc1,acc2,acc3,acc4,acc5,acc6,acc7,acc8,acc9,acc10,acc11,acc12,acc13,acc14,acc15,acc16];
+    return [
+        acc1, acc2, acc3, acc4, acc5, acc6, acc7, acc8, acc9, acc10, acc11, acc12, acc13, acc14,
+        acc15, acc16,
+    ];
 }
 
 #[macro_export]
 macro_rules! acc_infos_with_mem_layout {
-    () => {::nondet::fun_acc_infos_with_mem_layout()}
+    () => {
+        ::nondet::fun_acc_infos_with_mem_layout()
+    };
 }

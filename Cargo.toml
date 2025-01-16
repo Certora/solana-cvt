@@ -10,11 +10,11 @@ members = [
     "cvt-macros",
     "stubs",
     "calltrace",
-    "mathint",
+    "mathint", "cvlr-asserts",
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Certora"]
 description = "Certora Verification Language for Rust"
 documentation = "https://certora.com"
@@ -25,3 +25,11 @@ quote = "1"
 syn = "2"
 macrotest = "1"
 trybuild = "1"
+
+cvlr-asserts = { path = "cvlr-asserts" }
+cvlr-mathint = { path = "mathint", package = "mathint" }
+cvlr-nondet = { path = "nondet", package = "nondet" }
+cvlr-log = { path = "calltrace", package = "calltrace" }
+cvlr-vectors = { path = "vectors", package = "vectors" }
+cvlr-macros = { path = "cvt-macros", package = "cvt-macros" }
+cvlr-early-panic = { path = "early-panic", package = "early-panic" }

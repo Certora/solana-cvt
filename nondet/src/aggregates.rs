@@ -1,7 +1,5 @@
-use crate::Nondet;
-use std::alloc::{alloc,Layout};
-use cvt::CVT_assume;
-use crate::{nondet, nondet_impl};
+use crate::{nondet, Nondet};
+use std::alloc::{alloc, Layout};
 
 /// The returned pointer is a raw pointer and we won't free it.
 /// That's okay since this function is only for verification purposes.
@@ -11,13 +9,11 @@ pub fn nondet_pointer<T: Nondet>() -> *mut T {
     unsafe {
         let layout = Layout::new::<T>();
         let ptr = alloc(layout) as *mut T;
-        CVT_assume(!ptr.is_null());
+        cvlr_asserts::cvlr_assume!(!ptr.is_null());
         *ptr = nondet();
         ptr
     }
 }
-
-nondet_impl! { [u8; 32], cvt::CVT_nondet_array_of_32_bytes(), "Nondet for 32-byte array" }
 
 impl<T: Nondet> Nondet for Option<T> {
     #[inline]

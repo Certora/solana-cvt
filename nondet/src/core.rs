@@ -14,7 +14,7 @@ pub trait Nondet: Sized {
         F: FnOnce(&Self) -> bool,
     {
         let val = Self::nondet();
-        cvt::CVT_assume(func(&val));
+        cvlr_asserts::cvlr_assume!(func(&val));
         val
     }
 }

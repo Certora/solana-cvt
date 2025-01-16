@@ -8,8 +8,9 @@ publish = false
 [features]
 default = ["std", "solana"]
 std = []
-solana = ["std", "dep:solana-program", "stubs/solana"]
+solana = ["std", "dep:solana-program"]
 spl_token = ["solana", "dep:spl-token", "dep:spl-token-2022"]
+rt = []
 derive = ["derive_nondet"]
 
 [dependencies]
@@ -17,6 +18,5 @@ solana-program = {version = "1.18", optional=true}
 spl-token = { version = "4", optional=true}
 spl-token-2022 = { version = "3", optional=true }
 
-cvt = { path = "../cvt" }
-stubs = { path = "../stubs" }
+cvlr-asserts = { workspace = true }
 derive_nondet = { version = "0.3", path = "./derive", optional=true }
