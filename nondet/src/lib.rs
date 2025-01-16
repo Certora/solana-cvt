@@ -6,6 +6,9 @@ extern crate std;
 #[cfg(feature = "std")]
 mod aggregates;
 
+#[cfg(feature = "std")]
+pub mod havoc;
+
 mod core;
 mod scalars;
 
