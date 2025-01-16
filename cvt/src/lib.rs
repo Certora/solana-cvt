@@ -27,6 +27,11 @@ pub use log::cvlr_log as clog;
 
 pub use cvlr_macros::rule as cvlr_rule;
 pub use cvlr_early_panic::early_panic as cvlr_early_panic;
+pub use cvlr_hook::cvt_hook_start as cvlr_hook_on_entry;
+pub use cvlr_hook::cvt_hook_end as cvlr_hook_on_exit;
 
 pub use cvlr_macros::rule as rule;
 pub use cvlr_early_panic::early_panic as early_panic;
+pub use cvlr_hook::cvt_hook_start as hook_on_entry;
+pub use cvlr_hook::cvt_hook_end as hook_on_exit;
+

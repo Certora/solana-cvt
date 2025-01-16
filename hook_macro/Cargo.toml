@@ -8,7 +8,7 @@ publish = false
 proc-macro = true
 
 [dependencies]
-syn = { version = "1", features = ["full", "derive"] }
+syn = { workspace = true, features = ["full", "derive"] }
 quote = { workspace = true }
 
 [dev-dependencies]

@@ -33,3 +33,4 @@ cvlr-log = { path = "calltrace", package = "calltrace" }
 cvlr-vectors = { path = "vectors", package = "vectors" }
 cvlr-macros = { path = "cvt-macros", package = "cvt-macros" }
 cvlr-early-panic = { path = "early-panic", package = "early-panic" }
+cvlr-hook = { path = "hook_macro", package = "hook-macro"}

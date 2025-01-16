@@ -15,3 +15,4 @@ cvlr-log = { workspace = true }
 cvlr-nondet = { workspace = true }
 cvlr-macros = { workspace = true }
 cvlr-early-panic = { workspace = true }
+cvlr-hook = { workspace = true }

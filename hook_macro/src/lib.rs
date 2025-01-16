@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
-use syn::{parse_macro_input, AttributeArgs, ItemFn};
+use syn::{parse_macro_input, punctuated::Punctuated, ItemFn, Meta, Token};
 
 /**
 * This macro is used to insert a hook at the start of a function.
@@ -21,7 +21,8 @@ use syn::{parse_macro_input, AttributeArgs, ItemFn};
 #[proc_macro_attribute]
 pub fn cvt_hook_start(attr: TokenStream, input: TokenStream) -> TokenStream {
     // parse the attribute argument
-    let attr = parse_macro_input!(attr as AttributeArgs);
+    let attr = parse_macro_input!(attr with Punctuated::<Meta, Token![,]>::parse_terminated);
+
     if attr.len() != 1 {
         return quote! {
             compile_error!("Expected 1 argument");
@@ -29,7 +30,7 @@ pub fn cvt_hook_start(attr: TokenStream, input: TokenStream) -> TokenStream {
         .into();
     }
 
-    let arg = &attr[0];
+    let arg = attr.first().unwrap();
 
     // parse the input tokens and make sure it is a function
     let mut fn_item = parse_macro_input!(input as ItemFn);
@@ -67,7 +68,8 @@ pub fn cvt_hook_start(attr: TokenStream, input: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn cvt_hook_end(attr: TokenStream, input: TokenStream) -> TokenStream {
     // parse the attribute argument
-    let attr = parse_macro_input!(attr as AttributeArgs);
+
+    let attr = parse_macro_input!(attr with Punctuated::<Meta, Token![,]>::parse_terminated);
     if attr.len() != 1 {
         return quote! {
             compile_error!("Expected 1 argument");
@@ -75,7 +77,7 @@ pub fn cvt_hook_end(attr: TokenStream, input: TokenStream) -> TokenStream {
         .into();
     }
 
-    let arg = &attr[0];
+    let arg = &attr.first().unwrap();
 
     // parse the input tokens and make sure it is a function
     let mut fn_item = parse_macro_input!(input as ItemFn);
