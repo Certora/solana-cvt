@@ -1,6 +1,6 @@
 [package]
 name = "cvt-macros"
-version = "0.0.1"
+version.workspace = true
 authors = ["Arie Gurfinkel <arie@certora.com>"]
 edition = "2021"
 publish = false
@@ -9,6 +9,6 @@ publish = false
 proc-macro = true
 
 [dependencies]
-proc-macro2 = { version = "1", features = ["nightly"] }
-quote = "1"
-syn = {version = "2.0.39", features = ["visit-mut", "full"] }
+proc-macro2 = { workspace = true}
+quote = { workspace = true }
+syn = { workspace = true }

@@ -1,9 +1,9 @@
 [package]
 name = "stubs"
-version = "0.1.0"
+authors = ["Arie Gurfinkel <arie@certora.com>"]
+version.workspace = true
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
 impls = ["solana", "dep:solana-sdk"]
 solana = ["dep:solana-program"]
@@ -15,4 +15,3 @@ solana-sdk = { version = "1.17", optional = true  }
 [lib]
 crate-type = ["lib"]
 path = "mod.rs"
-name = "stubs"

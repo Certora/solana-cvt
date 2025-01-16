@@ -1,10 +1,10 @@
 [package]
 name = "calltrace"
-version = "0.0.1"
+version.workspace = true
 authors = ["Jorge Navas <jorge@certora.com>"]
 edition = "2021"
+publish = false
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 cvt = { path = "../cvt" }

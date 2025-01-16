@@ -1,12 +1,13 @@
 extern crate alloc;
-use core::ptr::NonNull;
+use alloc::alloc::{alloc, dealloc, Layout};
 use core::mem;
-use std::{ptr, ops::{Deref, DerefMut, Index, IndexMut}};
-use alloc::alloc::{Layout, alloc, dealloc};
-use nondet::Nondet;
-use std::io::{Read, Write, Result};
-use borsh::{BorshDeserialize, BorshSerialize};
+use core::ptr::NonNull;
 use cvt::cvt_assert;
+use std::io::{Read, Result, Write};
+use std::{
+    ops::{Deref, DerefMut, Index, IndexMut},
+    ptr,
+};
 
 /////////////////////////
 /// Raw Vec
@@ -25,22 +26,19 @@ impl<T> RawVec<T> {
     }
 
     fn new(capacity: usize) -> Self {
-
         // ZSTs have no memory allocation
         if mem::size_of::<T>() == 0 || capacity == 0 {
             return RawVec::new_zero_sized();
         }
 
-        let layout: Layout = Layout::array::<T>(capacity).unwrap_or_else(|_| panic!("capacity overflow"));
+        let layout: Layout =
+            Layout::array::<T>(capacity).unwrap_or_else(|_| panic!("capacity overflow"));
         let ptr: NonNull<T> = unsafe {
             let ptr: *mut u8 = alloc(layout);
             NonNull::new_unchecked(ptr as *mut T)
         };
 
-        Self {
-            ptr,
-            cap: capacity,
-        }
+        Self { ptr, cap: capacity }
     }
 }
 
@@ -125,7 +123,10 @@ impl<T> NoResizableVec<T> {
         }
     }
 
-    pub fn find(&self, value: &T) -> Option<usize> where T: Ord {
+    pub fn find(&self, value: &T) -> Option<usize>
+    where
+        T: Ord,
+    {
         for i in 0..self.len {
             unsafe {
                 let ptr: *mut T = self.buf.ptr.as_ptr().add(i);
@@ -138,12 +139,10 @@ impl<T> NoResizableVec<T> {
     }
 }
 
-
 impl<T> Drop for NoResizableVec<T> {
     fn drop(&mut self) {
         // do nothiing
     }
-
 }
 
 //////////////////
@@ -166,11 +165,7 @@ impl<T> Clone for NoResizableVec<T> {
         };
 
         unsafe {
-            ptr::copy_nonoverlapping(
-                self.buf.ptr.as_ptr(),
-                new_vec.buf.ptr.as_ptr(),
-                self.len()
-            );
+            ptr::copy_nonoverlapping(self.buf.ptr.as_ptr(), new_vec.buf.ptr.as_ptr(), self.len());
         }
 
         new_vec
@@ -181,17 +176,13 @@ impl<T> Deref for NoResizableVec<T> {
     type Target = [T];
 
     fn deref(&self) -> &[T] {
-        unsafe {
-            core::slice::from_raw_parts(self.buf.ptr.as_ptr(), self.len())
-        }
+        unsafe { core::slice::from_raw_parts(self.buf.ptr.as_ptr(), self.len()) }
     }
 }
 
 impl<T> DerefMut for NoResizableVec<T> {
     fn deref_mut(&mut self) -> &mut [T] {
-        unsafe {
-            core::slice::from_raw_parts_mut(self.buf.ptr.as_ptr(), self.len())
-        }
+        unsafe { core::slice::from_raw_parts_mut(self.buf.ptr.as_ptr(), self.len()) }
     }
 }
 
@@ -223,31 +214,63 @@ impl<T> IndexMut<usize> for NoResizableVec<T> {
     }
 }
 
+pub mod borsh0_9 {
+    use super::*;
 
+    impl<T> ::borsh0_9::BorshSerialize for NoResizableVec<T>
+    where
+        T: ::borsh0_9::BorshSerialize,
+    {
+        // Not implemented
+        fn serialize<W: Write>(&self, _writer: &mut W) -> Result<()> {
+            cvt_assert!(false);
+            unreachable!();
+        }
+    }
 
-impl<T> borsh::BorshSerialize for NoResizableVec<T>
-    where T: BorshSerialize, {
-    // Not implemented
-    fn serialize<W: Write>(&self, writer: &mut W) -> Result<()> {
-        cvt_assert!(false);
-        unreachable!();
+    impl<T> ::borsh0_9::BorshDeserialize for NoResizableVec<T>
+    where
+        T: ::borsh0_9::BorshDeserialize,
+    {
+        // Not implemented
+        fn deserialize(_buf: &mut &[u8]) -> Result<Self> {
+            cvt_assert!(false);
+            unreachable!();
+        }
     }
 }
 
-impl<T> BorshDeserialize for NoResizableVec<T> {
-    // Not implemented
-    fn deserialize(buf: &mut &[u8]) -> Result<Self> {
-        cvt_assert!(false);
-        unreachable!();
+pub mod borsh0_10 {
+    use super::*;
+
+    impl<T> ::borsh0_10::BorshSerialize for NoResizableVec<T>
+    where
+        T: ::borsh0_10::BorshSerialize,
+    {
+        // Not implemented
+        fn serialize<W: Write>(&self, _writer: &mut W) -> Result<()> {
+            cvt_assert!(false);
+            unreachable!();
+        }
     }
 
-    // Not implemented
-    fn deserialize_reader<R: Read>(reader: &mut R) -> Result<Self> {
-        cvt_assert!(false);
-        unreachable!();
+    impl<T> ::borsh0_10::BorshDeserialize for NoResizableVec<T>
+    where
+        T: ::borsh0_10::BorshDeserialize,
+    {
+        // Not implemented
+        fn deserialize(_buf: &mut &[u8]) -> Result<Self> {
+            cvt_assert!(false);
+            unreachable!();
+        }
+
+        // Not implemented
+        fn deserialize_reader<R: Read>(_reader: &mut R) -> Result<Self> {
+            cvt_assert!(false);
+            unreachable!();
+        }
     }
 }
-
 
 /////////////////////////
 /// Iterator
@@ -272,7 +295,7 @@ impl<T> Iterator for IntoIter<T> {
                     self.start = self.start.offset(1);
                     Some(ptr::read(old))
                 } else {
-                    self.start = (self.start as usize + 1*mem::align_of::<T>()) as *const _;
+                    self.start = (self.start as usize + 1 * mem::align_of::<T>()) as *const _;
                     Some(ptr::read(NonNull::<T>::dangling().as_ptr()))
                 }
             }
@@ -281,8 +304,12 @@ impl<T> Iterator for IntoIter<T> {
 
     fn size_hint(&self) -> (usize, Option<usize>) {
         let elem_size = mem::size_of::<T>();
-        let exact = (self.end as usize - self.start as usize) 
-                            / if elem_size == 0 { 1*mem::align_of::<T>() } else {elem_size};
+        let exact = (self.end as usize - self.start as usize)
+            / if elem_size == 0 {
+                1 * mem::align_of::<T>()
+            } else {
+                elem_size
+            };
         (exact, Some(exact))
     }
 }
@@ -294,7 +321,7 @@ impl<T> Drop for IntoIter<T> {
 }
 
 impl<T> IntoIterator for NoResizableVec<T> {
-    type Item =T;
+    type Item = T;
     type IntoIter = IntoIter<T>;
 
     fn into_iter(self) -> IntoIter<T> {
@@ -306,7 +333,7 @@ impl<T> IntoIterator for NoResizableVec<T> {
             IntoIter {
                 start: buf.ptr.as_ptr(),
                 end: if mem::size_of::<T>() == 0 {
-                    (buf.ptr.as_ptr() as usize + len*mem::align_of::<T>()) as *const _
+                    (buf.ptr.as_ptr() as usize + len * mem::align_of::<T>()) as *const _
                 } else if len == 0 {
                     buf.ptr.as_ptr()
                 } else {
@@ -344,3 +371,4 @@ macro_rules! cvt_no_resizable_vec {
     };
 }
 
+pub use cvt_no_resizable_vec;

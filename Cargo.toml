@@ -1,14 +1,27 @@
 [workspace]
 resolver = "2"
-members = [ 
-    "vectors", 
-    "cvt", 
+members = [
+    "vectors",
+    "cvt",
     "hook_macro",
     "early-panic",
-    "nondet", 
+    "nondet",
     "solana_cvt",
     "cvt-macros",
     "stubs",
     "calltrace",
-    "mathint"
+    "mathint",
 ]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Certora"]
+description = "Certora Verification Language for Rust"
+documentation = "https://certora.com"
+
+[workspace.dependencies]
+proc-macro2 = "1"
+quote = "1"
+syn = "2"
+macrotest = "1"
+trybuild = "1"
