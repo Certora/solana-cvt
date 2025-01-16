@@ -15,6 +15,3 @@ nondet = { path = "../nondet" }
 [features]
 certora-debug = []
 
-[lib]
-crate-type = ["lib"]
-path = "mod.rs"
