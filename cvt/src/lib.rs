@@ -19,6 +19,9 @@ pub mod nondet {
     pub use cvlr_nondet::*;
 } 
 
+pub use nondet::nondet;
+pub use nondet::nondet as cvlr_nondet;
+
 pub mod log {
     pub use cvlr_log::*;
 }
