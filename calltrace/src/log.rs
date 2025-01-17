@@ -9,7 +9,7 @@ pub trait CvlrLog {
 macro_rules! cvlr_log {
     ($v: expr) => {{
         let mut logger = $crate::CvlrLogger::new();
-        ($v).log(stringify!($v), logger);
+        ($v).log(stringify!($v), &mut logger);
     }};
 }
 
