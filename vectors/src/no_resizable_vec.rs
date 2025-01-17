@@ -346,7 +346,7 @@ macro_rules! cvt_no_resizable_vec {
     ($(values:expr),+ $(,)?) => (
         {
             let ARG_COUNT: usize = 0 $(+ { _ = $values; 1 })*;
-            let mut v = vectors::no_resizable_vec::NoResizableVec::new(ARG_COUNT*2);
+            let mut v = $crate::no_resizable_vec::NoResizableVec::new(ARG_COUNT*2);
             $(v.push($values);)*
             v
         }
@@ -356,7 +356,7 @@ macro_rules! cvt_no_resizable_vec {
         {
             let ARG_COUNT: usize = 0 $(+ { _ = $values; 1 })*;
             cvt::cvt_assert!(ARG_COUNT <= $cap);
-            let mut v = vectors::no_resizable_vec::NoResizableVec::new($cap);
+            let mut v = $crate::no_resizable_vec::NoResizableVec::new($cap);
             $(v.push($values);)*
             v
         }
