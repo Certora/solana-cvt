@@ -1,27 +1,27 @@
 mod rt_decls {
     extern "C" {
-        pub fn CVT_assume_c(_c: bool);
-        pub fn CVT_assert_c(_c: bool);
-        pub fn CVT_satisfy_c(_c: bool);
+        pub fn CVT_assume(_c: bool);
+        pub fn CVT_assert(_c: bool);
+        pub fn CVT_satisfy(_c: bool);
     }
 }
 
 #[cfg(feature = "rt")]
 mod rt_impls {
     #[no_mangle]
-    pub extern "C" fn CTV_assume_c(c: bool) {
+    pub extern "C" fn CTV_assume(c: bool) {
         if !c {
             panic!()
         }
     }
 
     #[no_mangle]
-    pub extern "C" fn CVT_assert_c(c: bool) {
+    pub extern "C" fn CVT_assert(c: bool) {
         assert!(c);
     }
 
     #[no_mangle]
-    pub extern "C" fn CVT_satisfy_c(c: bool) {
+    pub extern "C" fn CVT_satisfy(c: bool) {
         assert!(c);
     }
 }
@@ -31,21 +31,21 @@ use rt_decls::*;
 #[inline(always)]
 pub fn cvlr_assert_checked(c: bool) {
     unsafe {
-        CVT_assert_c(c);
+        CVT_assert(c);
     }
 }
 
 #[inline(always)]
 pub fn cvlr_assume_checked(c: bool) {
     unsafe {
-        CVT_assume_c(c);
+        CVT_assume(c);
     }
 }
 
 #[inline(always)]
 pub fn cvlr_satisfy_checked(c: bool) {
     unsafe {
-        CVT_satisfy_c(c);
+        CVT_satisfy(c);
     }
 }
 
