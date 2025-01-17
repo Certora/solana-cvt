@@ -54,7 +54,7 @@ use rt_decls::*;
 
 macro_rules! impl_checked_fn {
     ($name:ident, $c_name:ident, $ty:ident) => {
-        #[inline(always)]
+        #[inline(never)]
         pub fn $name() -> $ty {
             unsafe { $c_name() }
         }
