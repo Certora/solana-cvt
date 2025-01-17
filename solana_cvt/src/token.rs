@@ -2,10 +2,11 @@
 ///
 use arrayref::{array_mut_ref, array_ref, array_refs, mut_array_refs};
 use solana_program::{
-    account_info::AccountInfo,
-    entrypoint::ProgramResult,
-    program_error::ProgramError,
+    account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError
 };
+
+use cvlr_mathint::NativeInt as MathInt;
+use cvlr_asserts::cvlr_assume;
 
 /// Unpack only amount from account [info] base
 pub fn spl_token_account_get_amount(info: &AccountInfo) -> u64 {
@@ -13,7 +14,9 @@ pub fn spl_token_account_get_amount(info: &AccountInfo) -> u64 {
     let base = array_ref![*data, 0, 165];
     let (_mint, _owner, amount, _delegate, _state, _is_native, _delegated_amount, _close_authority) =
         array_refs![base, 32, 32, 8, 36, 1, 12, 8, 36];
-    return u64::from_le_bytes(*amount);
+    let val = u64::from_le_bytes(*amount);
+    cvlr_assume!(MathInt::from(val) <= MathInt::u64_max());
+    val
 }
 
 /// Pack only [amount] from account [info] base
@@ -39,7 +42,9 @@ pub fn spl_mint_get_supply(mint: &AccountInfo) -> u64 {
     let src = array_ref![*data, 0, 82];
     let (_mint_authority, supply, _decimals, _is_initialized, _freeze_authority) =
         array_refs![src, 36, 8, 1, 1, 36];
-    return u64::from_le_bytes(*supply);
+    let supply =  u64::from_le_bytes(*supply);
+    cvlr_assume!(MathInt::from(supply) <= MathInt::u64_max());
+    supply
 }
 
 /// Unpack only decimals from [mint] base
@@ -48,7 +53,9 @@ pub fn spl_mint_get_decimals(mint: &AccountInfo) -> u8 {
     let src = array_ref![*data, 0, 82];
     let (_mint_authority, _supply, decimals, _is_initialized, _freeze_authority) =
         array_refs![src, 36, 8, 1, 1, 36];
-    return decimals[0];
+    let decimals = decimals[0];
+    cvlr_assume!(MathInt::from(decimals as u64) <= MathInt::from(255u64));
+    decimals
 }
 
 
