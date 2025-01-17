@@ -1,8 +1,5 @@
 #![no_std]
 
-mod legacy;
-pub use legacy::*;
-
 pub mod cvt_asserts;
 
 pub mod u128_arith;
