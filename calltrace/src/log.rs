@@ -12,12 +12,11 @@ pub fn cvlr_log_<T: CvlrLog>(tag: &str, val: &T, logger: &mut CvlrLogger) {
 macro_rules! cvlr_log {
     ($v: expr) => {{
         let mut logger = $crate::CvlrLogger::new();
-        $crate::cvlr_log_(stringify!($v), &v, &mut logger);
+        $crate::cvlr_log_(stringify!($v), &($v), &mut logger);
     }};
 }
 
 pub use cvlr_log as clog;
-
 
 impl CvlrLog for u64 {
     fn log(&self, tag: &str, logger: &mut CvlrLogger) {
