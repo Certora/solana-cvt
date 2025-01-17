@@ -79,7 +79,7 @@ fn spl_transfer<'a>(
         let mut dst_amount = spl_token_account_get_amount(dst_info);
 
         // source has enough founds
-        cvt::cvt_assume!(src_amount >= amount);
+        cvlr_asserts::cvlr_assume!(src_amount >= amount);
 
         src_amount = src_amount.checked_sub(amount).unwrap();
         dst_amount = dst_amount.checked_add(amount).unwrap();
@@ -145,7 +145,7 @@ pub fn spl_burn<'a> (
     let mut src_amount = spl_token_account_get_amount(src_info);
 
     // -- enough funds to burn
-    ::cvt::cvt_assume!(amount >= src_amount);
+    cvlr_asserts::cvlr_assume!(amount >= src_amount);
 
     mint_supply = mint_supply.checked_sub(amount).unwrap();
     src_amount = src_amount.checked_sub(amount).unwrap();

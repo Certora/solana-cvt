@@ -9,5 +9,5 @@ publish = false
 solana-program = "1.18"
 arrayref = "0.3"
 
-cvt = { path = "../cvt" }
-nondet = { path = "../nondet" }
+cvlr-asserts = { workspace = true }
+cvlr-nondet = { workspace = true }
