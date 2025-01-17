@@ -4,6 +4,7 @@ pub trait CvlrLog {
     fn log(&self, tag: &str, logger: &mut CvlrLogger);
 }
 
+#[inline(always)]
 pub fn cvlr_log_<T: CvlrLog>(tag: &str, val: &T, logger: &mut CvlrLogger) {
     val.log(tag, logger);
 }
