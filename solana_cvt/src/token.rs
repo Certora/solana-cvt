@@ -15,7 +15,7 @@ pub fn spl_token_account_get_amount(info: &AccountInfo) -> u64 {
     let (_mint, _owner, amount, _delegate, _state, _is_native, _delegated_amount, _close_authority) =
         array_refs![base, 32, 32, 8, 36, 1, 12, 8, 36];
     let val = u64::from_le_bytes(*amount);
-    cvlr_assume!(MathInt::from(val) <= MathInt::u64_max());
+    cvlr_assume!(MathInt::from(val).is_u64());
     val
 }
 
@@ -43,7 +43,7 @@ pub fn spl_mint_get_supply(mint: &AccountInfo) -> u64 {
     let (_mint_authority, supply, _decimals, _is_initialized, _freeze_authority) =
         array_refs![src, 36, 8, 1, 1, 36];
     let supply =  u64::from_le_bytes(*supply);
-    cvlr_assume!(MathInt::from(supply) <= MathInt::u64_max());
+    cvlr_assume!(MathInt::from(supply).is_u64());
     supply
 }
 
@@ -54,7 +54,7 @@ pub fn spl_mint_get_decimals(mint: &AccountInfo) -> u8 {
     let (_mint_authority, _supply, decimals, _is_initialized, _freeze_authority) =
         array_refs![src, 36, 8, 1, 1, 36];
     let decimals = decimals[0];
-    cvlr_assume!(MathInt::from(decimals as u64) <= MathInt::from(255u64));
+    cvlr_assume!(MathInt::from(decimals).is_u8());
     decimals
 }
 

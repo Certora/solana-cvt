@@ -168,6 +168,31 @@ impl NativeIntU64 {
         unsafe { Self(CVT_nativeint_u64_u256_max()) }
     }
 
+    pub fn is_u8(&self) -> bool {
+        *self <= Self::new(u8::MAX as u64)
+    }
+
+    pub fn is_u16(&self) -> bool {
+        *self <= Self::new(u16::MAX as u64)
+    }
+    
+    pub fn is_u32(&self) -> bool {
+        *self <= Self::new(u32::MAX as u64)
+    }
+
+    pub fn is_u64(&self) -> bool {
+        *self <= Self::u64_max()
+    }
+
+    pub fn is_u128(&self) -> bool {
+        *self <= Self::u128_max()
+    }
+
+    pub fn is_u256(&self) -> bool {
+        // native ints are 256 bits
+        true
+    }
+
     pub fn nondet() -> Self {
         nondet::nondet()
     }
@@ -292,6 +317,12 @@ impl std::ops::Div<u64> for NativeIntU64 {
 
     fn div(self, rhs: u64) -> Self::Output {
         self / Self(rhs)
+    }
+}
+
+impl From<u8> for NativeIntU64 {
+    fn from(value: u8) -> Self {
+        Self(value as u64)
     }
 }
 
