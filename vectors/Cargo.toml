@@ -9,8 +9,8 @@ edition = "2021"
 anchor-lang = { version = "0.29"}
 borsh0_10 = { package = "borsh", version = "0.10" }
 borsh0_9 = { package = "borsh", version = "0.9" }
-cvt = { path = "../cvt" }
-nondet = { path = "../nondet" }
+cvlr-asserts = { workspace = true }
+cvlr-nondet = { workspace = true }
 
 [features]
 certora-debug = []

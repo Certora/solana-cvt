@@ -2,7 +2,7 @@ extern crate alloc;
 use alloc::alloc::{alloc, dealloc, Layout};
 use core::mem;
 use core::ptr::NonNull;
-use cvt::cvt_assert;
+use cvlr_asserts::cvlr_assert;
 use std::io::{Read, Result, Write};
 use std::{
     ops::{Deref, DerefMut, Index, IndexMut},
@@ -81,7 +81,7 @@ impl<T> NoResizableVec<T> {
     }
 
     pub fn push(&mut self, value: T) {
-        cvt_assert!(self.buf.cap > self.len);
+        cvlr_assert!(self.buf.cap > self.len);
         unsafe {
             let end: *mut T = self.buf.ptr.as_ptr().add(self.len);
             end.write(value);
@@ -102,8 +102,8 @@ impl<T> NoResizableVec<T> {
     }
 
     pub fn insert(&mut self, index: usize, value: T) {
-        cvt_assert!(self.buf.cap > self.len);
-        cvt_assert!(index <= self.len);
+        cvlr_assert!(self.buf.cap > self.len);
+        cvlr_assert!(index <= self.len);
         unsafe {
             let ptr: *mut T = self.buf.ptr.as_ptr().add(index);
             ptr.copy_to(ptr.add(1), self.len - index);
@@ -113,7 +113,7 @@ impl<T> NoResizableVec<T> {
     }
 
     pub fn remove(&mut self, index: usize) -> T {
-        cvt_assert!(index < self.len);
+        cvlr_assert!(index < self.len);
         unsafe {
             self.len -= 1;
             let ptr: *mut T = self.buf.ptr.as_ptr().add(index);
@@ -190,7 +190,7 @@ impl<T> Index<usize> for NoResizableVec<T> {
     type Output = T;
 
     fn index(&self, index: usize) -> &T {
-        cvt_assert!(index < self.len());
+        cvlr_assert!(index < self.len());
         unsafe {
             if mem::size_of::<T>() == 0 {
                 NonNull::<T>::dangling().as_ref()
@@ -203,7 +203,7 @@ impl<T> Index<usize> for NoResizableVec<T> {
 
 impl<T> IndexMut<usize> for NoResizableVec<T> {
     fn index_mut(&mut self, index: usize) -> &mut T {
-        cvt_assert!(index < self.len());
+        cvlr_assert!(index < self.len());
         unsafe {
             if mem::size_of::<T>() == 0 {
                 NonNull::<T>::dangling().as_mut()
@@ -221,7 +221,7 @@ pub mod borsh0_9 {
     {
         // Not implemented
         fn serialize<W: Write>(&self, _writer: &mut W) -> Result<()> {
-            cvt_assert!(false);
+            cvlr_assert!(false);
             unreachable!();
         }
     }
@@ -230,7 +230,7 @@ pub mod borsh0_9 {
     {
         // Not implemented
         fn deserialize(_buf: &mut &[u8]) -> Result<Self> {
-            cvt_assert!(false);
+            cvlr_assert!(false);
             unreachable!();
         }
     }
@@ -243,7 +243,7 @@ pub mod borsh0_10 {
     {
         // Not implemented
         fn serialize<W: Write>(&self, _writer: &mut W) -> Result<()> {
-            cvt_assert!(false);
+            cvlr_assert!(false);
             unreachable!();
         }
     }
@@ -252,13 +252,13 @@ pub mod borsh0_10 {
     {
         // Not implemented
         fn deserialize(_buf: &mut &[u8]) -> Result<Self> {
-            cvt_assert!(false);
+            cvlr_assert!(false);
             unreachable!();
         }
 
         // Not implemented
         fn deserialize_reader<R: Read>(_reader: &mut R) -> Result<Self> {
-            cvt_assert!(false);
+            cvlr_assert!(false);
             unreachable!();
         }
     }
@@ -355,7 +355,7 @@ macro_rules! cvt_no_resizable_vec {
     ([$($values:expr),* $(,)?]; $cap:expr) => {
         {
             let ARG_COUNT: usize = 0 $(+ { _ = $values; 1 })*;
-            cvt::cvt_assert!(ARG_COUNT <= $cap);
+            cvlr::asserts::cvlr_assert!(ARG_COUNT <= $cap);
             let mut v = $crate::no_resizable_vec::NoResizableVec::new($cap);
             $(v.push($values);)*
             v
