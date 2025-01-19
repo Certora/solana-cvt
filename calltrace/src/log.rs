@@ -9,21 +9,26 @@ pub fn cvlr_log_<T: CvlrLog>(tag: &str, val: &T, logger: &mut CvlrLogger) {
     val.log(tag, logger);
 }
 
+#[inline(always)]
+pub fn cvlr_log<T: CvlrLog>(tag: &str, val: &T) {
+    let mut logger = CvlrLogger::new();
+    val.log(tag, &mut logger);
+}
+
 #[macro_export]
 macro_rules! cvlr_log {
-    ($v:expr => $t:expr) => {{
-        let mut logger = $crate::CvlrLogger::new();
-        $crate::cvlr_log_($t, &($v), &mut logger);
-    }};
+    ($v:expr => $t:expr) => {
+        $crate::cvlr_log($t, &($v));
+    };
 
-    ($v:expr) => {{
+    ($v:expr) => {
         cvlr_log! { $v => stringify!($v) }
-    }};
+    };
 
-    ($v:expr, $( $vs:expr ),+) => {{
+    ($v:expr, $( $vs:expr ),+) => {
         cvlr_log! { $v }
         cvlr_log! { $( $vs ),+ }
-    }};
+    };
 }
 
 pub use cvlr_log as clog;
