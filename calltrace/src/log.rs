@@ -22,12 +22,12 @@ macro_rules! cvlr_log {
     };
 
     ($v:expr) => {
-        cvlr_log! { $v => stringify!($v) }
+        $crate::cvlr_log! { $v => stringify!($v) }
     };
 
     ($v:expr, $( $vs:expr ),+) => {
-        cvlr_log! { $v }
-        cvlr_log! { $( $vs ),+ }
+        $crate::cvlr_log! { $v }
+        $crate::cvlr_log! { $( $vs ),+ }
     };
 }
 
