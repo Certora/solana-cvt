@@ -33,13 +33,22 @@ macro_rules! cvlr_log {
 
 pub use cvlr_log as clog;
 
-impl CvlrLog for u64 {
-    fn log(&self, tag: &str, logger: &mut CvlrLogger) {
-        logger.log_u64(tag, *self);
-    }
+macro_rules! impl_cvlr_log_for_uint {
+    ($t:ty) => {
+        impl CvlrLog for $t {
+            fn log(&self, tag: &str, logger: &mut CvlrLogger) {
+                logger.log_u64(tag, *self as u64);
+            }
+        }
+    };
 }
 
-impl CvlrLog for &u64 {
+impl_cvlr_log_for_uint!(u8);
+impl_cvlr_log_for_uint!(u16);
+impl_cvlr_log_for_uint!(u32);
+impl_cvlr_log_for_uint!(u64);
+
+impl<T: CvlrLog> CvlrLog for &T {
     fn log(&self, tag: &str, logger: &mut CvlrLogger) {
         (**self).log(tag, logger);
     }
