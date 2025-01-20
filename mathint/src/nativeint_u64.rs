@@ -320,17 +320,22 @@ impl std::ops::Div<u64> for NativeIntU64 {
     }
 }
 
-impl From<u8> for NativeIntU64 {
-    fn from(value: u8) -> Self {
-        Self(value as u64)
-    }
+macro_rules! impl_from_for_uint {
+    ($t:ty) => {
+        impl From<$t> for NativeIntU64 {
+            fn from(value: $t) -> Self {
+                Self(value as u64)
+            }
+        }
+
+    };
+
 }
 
-impl From<u64> for NativeIntU64 {
-    fn from(value: u64) -> Self {
-        Self(value)
-    }
-}
+impl_from_for_uint!(u8);
+impl_from_for_uint!(u16);
+impl_from_for_uint!(u32);
+impl_from_for_uint!(u64);
 
 impl From<u128> for NativeIntU64 {
     fn from(value: u128) -> Self {
