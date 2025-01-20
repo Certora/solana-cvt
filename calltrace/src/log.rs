@@ -48,6 +48,25 @@ impl_cvlr_log_for_uint!(u16);
 impl_cvlr_log_for_uint!(u32);
 impl_cvlr_log_for_uint!(u64);
 
+macro_rules! impl_cvlr_log_for_int {
+    ($t:ty) => {
+        impl CvlrLog for $t {
+            fn log(&self, tag: &str, logger: &mut CvlrLogger) {
+                logger.log_i64(tag, *self as i64);
+            }
+        }
+    };
+}
+
+impl_cvlr_log_for_int!(i8);
+impl_cvlr_log_for_int!(i16);
+impl_cvlr_log_for_int!(i32);
+impl_cvlr_log_for_int!(i64);
+
+
+
+
+
 impl<T: CvlrLog> CvlrLog for &T {
     fn log(&self, tag: &str, logger: &mut CvlrLogger) {
         (**self).log(tag, logger);
