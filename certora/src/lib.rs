@@ -157,7 +157,6 @@ macro_rules! satisfy {
 #[macro_export]
 macro_rules! apply_summary {
     (@mk_orig_module $id:ident, [$($prototype:tt)*], $( -> $ret:ty )?, $body:block) => {
-        #[cfg(feature="certora")]
         pub(crate) mod $id {
             use super::*;
             #[allow(dead_code)]
@@ -165,7 +164,7 @@ macro_rules! apply_summary {
             pub(crate) fn $id($($prototype)*) $( -> $ret )? $body
         }
     };
-    (@mk_orig $( #[$meta:meta] )*, $id:ident, [$($prototype:tt)*], $( -> $ret:ty )?, $body:block) => {
+    (@mk_orig $( #[$meta:meta] )*, $vis:vis, $id:ident, [$($prototype:tt)*], $( -> $ret:ty )?, $body:block) => {
         $( #[$meta] )*
         $vis fn $id($($prototype)*) $( -> $ret )? $body
     };
@@ -180,12 +179,13 @@ macro_rules! apply_summary {
             $new($($arg),*)
         }
 
+        #[cfg(feature="certora")]
         $crate::apply_summary!(
             @mk_orig_module $id, [$($arg : $arg_ty),*], $( -> $ret  )?, $body
         );
 
         #[cfg(not(feature="certora"))]
-        $crate::apply_summary!(@mk_orig $( #[$meta] )*, $id, [$($arg : $arg_ty),*], $( -> $ret  )?, $body);
+        $crate::apply_summary!(@mk_orig $( #[$meta] )*, $vis, $id, [$($arg : $arg_ty),*], $( -> $ret  )?, $body);
     };
 
     ($spec:ident, $old:ident,
@@ -199,10 +199,11 @@ macro_rules! apply_summary {
             $self.$spec($($arg),*)
         }
 
+        #[cfg(feature="certora")]
         pub(crate) fn $old(&mut $self, $($arg : $arg_ty),*) $( -> $ret )? $body
 
         #[cfg(not(feature="certora"))]
-        $crate::apply_summary!(@mk_orig $( #[$meta] )*, $id, [&mut $self, $($arg : $arg_ty),*], $( -> $ret  )?, $body);
+        $crate::apply_summary!(@mk_orig $( #[$meta] )*, $vis, $id, [&mut $self, $($arg : $arg_ty),*], $( -> $ret  )?, $body);
     };
 
     ($spec:ident, $old:ident,
@@ -216,10 +217,11 @@ macro_rules! apply_summary {
             $self.$spec($($arg),*)
         }
 
+        #[cfg(feature="certora")]
         pub(crate) fn $old(&$self, $($arg : $arg_ty),*) $( -> $ret )? $body
 
         #[cfg(not(feature="certora"))]
-        $crate::apply_summary!(@mk_orig $( #[$meta] )*, $id, [&$self, $($arg : $arg_ty),*], $( -> $ret  )?, $body);
+        $crate::apply_summary!(@mk_orig $( #[$meta] )*, $vis, $id, [&$self, $($arg : $arg_ty),*], $( -> $ret  )?, $body);
     };
 
     ($spec:ident, $old:ident,
@@ -233,9 +235,10 @@ macro_rules! apply_summary {
             $self.$spec($($arg),*)
         }
 
+        #[cfg(feature="certora")]
         pub(crate) fn $old($self, $($arg : $arg_ty),*) $( -> $ret )? $body
 
         #[cfg(not(feature="certora"))]
-        $crate::apply_summary!(@mk_orig $( #[$meta] )*, $id, [$self, $($arg : $arg_ty),*], $( -> $ret  )?, $body);
+        $crate::apply_summary!(@mk_orig $( #[$meta] )*, $vis, $id, [$self, $($arg : $arg_ty),*], $( -> $ret  )?, $body);
     };
 }
