@@ -38,10 +38,21 @@ pub fn cvlr_nondet_pubkey() -> Pubkey {
     unsafe { rt_decls::CVT_nondet_pubkey() }
 }
 
-pub fn cvlr_nondet_coption_pubkey() -> COption<Pubkey> {
+pub fn cvlr_nondet_option_pubkey() -> Option<Pubkey> {
+    cvlr_nondet::nondet_option(|| cvlr_nondet_pubkey())
+}
+
+pub fn cvlr_nondet_coption<T, F>(func: F) -> COption<T>
+where
+    F: FnOnce() -> T,
+{
     if cvlr_nondet::nondet::<bool>() {
-        COption::None
+        COption::Some(func())
     } else {
-        COption::Some(cvlr_nondet_pubkey())
+        COption::None
     }
+}
+
+pub fn cvlr_nondet_coption_pubkey() -> COption<Pubkey> {
+    cvlr_nondet_coption(|| cvlr_nondet_pubkey())
 }

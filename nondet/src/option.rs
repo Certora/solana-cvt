@@ -10,3 +10,14 @@ impl<T: Nondet> Nondet for Option<T> {
         }
     }
 }
+
+pub fn nondet_option<T, F>(func: F) -> Option<T>
+where
+    F: FnOnce() -> T,
+{
+    if nondet::<bool>() {
+        Some(func())
+    } else {
+        None
+    }
+}
