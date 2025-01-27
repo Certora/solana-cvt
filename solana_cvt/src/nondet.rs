@@ -34,6 +34,10 @@ pub fn cvlr_nondet_account_info() -> AccountInfo<'static> {
     unsafe { rt_decls::CVT_nondet_account_info() }
 }
 
+pub fn cvlr_nondet_account_info_ref() -> &'static mut AccountInfo<'static> {
+    Box::leak(Box::new(cvlr_nondet_account_info()))
+}
+
 pub fn cvlr_nondet_pubkey() -> Pubkey {
     unsafe { rt_decls::CVT_nondet_pubkey() }
 }
