@@ -3,20 +3,16 @@
 #[cfg(feature = "std")]
 extern crate std;
 
-#[cfg(feature = "std")]
-mod aggregates;
+mod core;
+mod option;
+mod scalars;
 
 #[cfg(feature = "std")]
 pub mod havoc;
 
-mod core;
-mod scalars;
+pub use core::{Nondet, nondet, nondet_with};
 
-pub use crate::core::*;
-pub use scalars::*;
-
-#[cfg(feature = "std")]
-pub use aggregates::*;
+pub use scalars::{cvlr_nondet_small_u128, cvlr_nondet_small_i128}; 
 
 #[cfg(feature = "derive")]
 pub use derive_nondet::*;

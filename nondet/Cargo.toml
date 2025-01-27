@@ -6,7 +6,7 @@ edition = "2021"
 publish = false
 
 [features]
-default = []
+default = ["std"]
 std = []
 rt = []
 derive = ["derive_nondet"]

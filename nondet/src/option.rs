@@ -1,5 +1,4 @@
 use crate::{nondet, Nondet};
-use std::alloc::{alloc, Layout};
 
 impl<T: Nondet> Nondet for Option<T> {
     #[inline]
