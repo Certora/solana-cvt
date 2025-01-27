@@ -5,8 +5,14 @@ version.workspace = true
 edition = "2021"
 publish = false
 
+[features]
+default = []
+rt = ["cvlr-nondet/rt", "cvlr-asserts/rt", "cvlr-mathint/rt"]
+
 [dependencies]
 solana-program = "1.18"
+spl-token = { version = "4" }
+spl-token-2022 = { version = "3" }
 arrayref = "0.3"
 
 cvlr-asserts = { workspace = true }

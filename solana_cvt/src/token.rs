@@ -2,11 +2,11 @@
 ///
 use arrayref::{array_mut_ref, array_ref, array_refs, mut_array_refs};
 use solana_program::{
-    account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError
+    account_info::AccountInfo, entrypoint::ProgramResult, program_error::ProgramError,
 };
 
-use cvlr_mathint::NativeInt as MathInt;
 use cvlr_asserts::cvlr_assume;
+use cvlr_mathint::NativeInt as MathInt;
 
 /// Unpack only amount from account [info] base
 pub fn spl_token_account_get_amount(info: &AccountInfo) -> u64 {
@@ -42,7 +42,7 @@ pub fn spl_mint_get_supply(mint: &AccountInfo) -> u64 {
     let src = array_ref![*data, 0, 82];
     let (_mint_authority, supply, _decimals, _is_initialized, _freeze_authority) =
         array_refs![src, 36, 8, 1, 1, 36];
-    let supply =  u64::from_le_bytes(*supply);
+    let supply = u64::from_le_bytes(*supply);
     cvlr_assume!(MathInt::from(supply).is_u64());
     supply
 }
@@ -57,7 +57,6 @@ pub fn spl_mint_get_decimals(mint: &AccountInfo) -> u8 {
     cvlr_assume!(MathInt::from(decimals).is_u8());
     decimals
 }
-
 
 /// Pack only [supply] from [mint] base
 pub fn spl_mint_set_supply(supply: u64, mint: &AccountInfo) {
@@ -119,15 +118,13 @@ pub fn spl_token_2022_transfer<'a>(
     spl_transfer(src_info, dst_info, authority_info, amount)
 }
 
-
 /// Summary for SPL Token MintTo instruction
-pub fn spl_mint_to<'a> (
+pub fn spl_mint_to<'a>(
     mint_info: &AccountInfo<'a>,
     dst_info: &AccountInfo<'a>,
     _authority: &AccountInfo<'a>,
-    amount: u64
+    amount: u64,
 ) -> ProgramResult {
-
     let mut mint_supply = spl_mint_get_supply(mint_info);
     let mut dst_amount = spl_token_account_get_amount(dst_info);
 
@@ -141,13 +138,12 @@ pub fn spl_mint_to<'a> (
 }
 
 /// Summary for SPL Token Burn instruction
-pub fn spl_burn<'a> (
+pub fn spl_burn<'a>(
     mint_info: &AccountInfo<'a>,
     src_info: &AccountInfo<'a>,
     _authority: &AccountInfo<'a>,
-    amount: u64
+    amount: u64,
 ) -> ProgramResult {
-
     let mut mint_supply = spl_mint_get_supply(mint_info);
     let mut src_amount = spl_token_account_get_amount(src_info);
 
@@ -164,13 +160,13 @@ pub fn spl_burn<'a> (
 }
 
 /// Summary for SPL Token close_account instruction
-pub fn spl_close_account<'a> (
+pub fn spl_close_account<'a>(
     src_info: &AccountInfo<'a>,
     dst_info: &AccountInfo<'a>,
-    _authority_info: &AccountInfo<'a>
+    _authority_info: &AccountInfo<'a>,
 ) -> ProgramResult {
     if src_info.key != dst_info.key {
-        return Err(ProgramError::InvalidAccountData)
+        return Err(ProgramError::InvalidAccountData);
     }
 
     let src_amount = spl_token_account_get_amount(src_info);
@@ -181,4 +177,22 @@ pub fn spl_close_account<'a> (
     }
 
     Ok(())
-}    
+}
+
+macro_rules! impl_nondet_mint {
+    ($name:ident, $mint_ty:ty) => {
+        pub fn $name() -> $mint_ty {
+            use $mint_ty as Mint;
+            Mint {
+                mint_authority: $crate::cvlr_nondet_coption_pubkey(),
+                supply: cvlr_nondet::nondet(),
+                decimals: cvlr_nondet::nondet(),
+                is_initialized: cvlr_nondet::nondet(),
+                freeze_authority: $crate::cvlr_nondet_coption_pubkey(),
+            }
+        }
+    };
+}
+
+impl_nondet_mint!(cvlr_nondet_token_mint, spl_token::state::Mint);
+impl_nondet_mint!(cvlr_nondet_token_2022_mint, spl_token_2022::state::Mint);
