@@ -1,6 +1,5 @@
-use solana_program::account_info::AccountInfo;
 use crate::nondet::cvlr_nondet_account_info;
-
+use solana_program::account_info::AccountInfo;
 
 /**
 
@@ -124,8 +123,8 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
      *               16                               16                                   16                 16                 16              16
      *   data &[u8] ... data &[u8] | lamports Rc  ... lamports Rc | lamports &u64 ... lamports &u64 | data Rc ... data Rc  | key ... key   | owner ... owner
      *    ^                           ^                              ^                                 ^                      ^               ^
-     *   0x400_000_008             | 0x40A_000_080                | 0x40A_000_480                   | 0x40A_000_500        | 0x40A_002_500 | 0x40A_002_900      
-     *           
+     *   0x400_000_008             | 0x40A_000_080                | 0x40A_000_480                   | 0x40A_000_500        | 0x40A_002_500 | 0x40A_002_900
+     *
      *   <----  16*0xA00_008 -----><----------  16*64=0x400 ------><------------ 16*8=0x80----------><----16*512=0x2000----><-----0x400---><-----0x400----->
      *
      **/
@@ -268,4 +267,78 @@ macro_rules! acc_infos_with_mem_layout {
     () => {
         $crate::fun_acc_infos_with_mem_layout()
     };
+}
+
+pub fn cvlr_mk_account_info() -> AccountInfo<'static> {
+    unsafe { cvlr_mk_account_info_unchecked() }
+}
+
+#[allow(unused_assignments)]
+unsafe fn cvlr_mk_account_info_unchecked() -> AccountInfo<'static> {
+    use solana_program::{
+        entrypoint::{BPF_ALIGN_OF_U128, MAX_PERMITTED_DATA_INCREASE},
+        pubkey::Pubkey,
+    };
+    use std::{
+        alloc::{alloc, Layout},
+        cell::RefCell,
+        rc::Rc,
+    };
+
+    const SIZE: usize = 4 + 4 + 32 + 32 + 8 + 8 + 5 * 1024 * 1024 + MAX_PERMITTED_DATA_INCREASE + 8;
+
+    let layout = Layout::from_size_align_unchecked(SIZE, BPF_ALIGN_OF_U128);
+    let input: *mut u8 = alloc(layout);
+    cvlr_nondet::havoc::memhavoc(input, layout.size());
+
+    let mut offset: usize = 0;
+
+    offset += size_of::<u8>();
+
+    let is_signer = *(input.add(offset) as *const u8) != 0;
+    offset += size_of::<u8>();
+
+    let is_writable = *(input.add(offset) as *const u8) != 0;
+    offset += size_of::<u8>();
+
+    let executable = *(input.add(offset) as *const u8) != 0;
+    offset += size_of::<u8>();
+
+    let original_data_len_offset = offset;
+    offset += size_of::<u32>();
+
+    let key: &Pubkey = &*(input.add(offset) as *const Pubkey);
+    offset += size_of::<Pubkey>();
+
+    let owner: &Pubkey = &*(input.add(offset) as *const Pubkey);
+    offset += size_of::<Pubkey>();
+
+    let lamports = Rc::new(RefCell::new(&mut *(input.add(offset) as *mut u64)));
+    offset += size_of::<u64>();
+
+    let data_len = *(input.add(offset) as *const u64) as usize;
+    offset += size_of::<u64>();
+
+    *(input.add(original_data_len_offset) as *mut u32) = data_len as u32;
+
+    let data = Rc::new(RefCell::new({
+        std::slice::from_raw_parts_mut(input.add(offset), data_len)
+    }));
+
+    offset += data_len + MAX_PERMITTED_DATA_INCREASE;
+    offset += (offset as *const u8).align_offset(BPF_ALIGN_OF_U128);
+
+    let rent_epoch = *(input.add(offset) as *const u64);
+    offset += size_of::<u64>();
+
+    AccountInfo {
+        key,
+        is_signer,
+        is_writable,
+        lamports,
+        data,
+        owner,
+        executable,
+        rent_epoch,
+    }
 }
