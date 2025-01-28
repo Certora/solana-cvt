@@ -286,7 +286,7 @@ unsafe fn cvlr_mk_account_info_unchecked() -> AccountInfo<'static> {
         rc::Rc,
     };
 
-    const SIZE: usize = 4 + 4 + 32 + 32 + 8 + 8 + 5 * 1024 * 1024 + MAX_PERMITTED_DATA_INCREASE + 8;
+    const SIZE: usize = 4 + 4 + 32 + 32 + 8 + 8 + 1 * 1024 + MAX_PERMITTED_DATA_INCREASE + 8;
 
     let layout = Layout::from_size_align_unchecked(SIZE, BPF_ALIGN_OF_U128);
     let input: *mut u8 = alloc(layout);
