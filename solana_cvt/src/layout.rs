@@ -282,6 +282,7 @@ unsafe fn cvlr_mk_account_info_unchecked() -> AccountInfo<'static> {
     use std::{
         alloc::{alloc, Layout},
         cell::RefCell,
+        mem::size_of,
         rc::Rc,
     };
 
