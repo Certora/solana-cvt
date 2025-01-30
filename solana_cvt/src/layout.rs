@@ -269,28 +269,50 @@ macro_rules! acc_infos_with_mem_layout {
     };
 }
 
-pub fn cvlr_mk_account_info() -> AccountInfo<'static> {
-    unsafe { cvlr_mk_account_info_unchecked() }
+pub fn cvlr_new_account_info(acc_no: u64) -> AccountInfo<'static> {
+    unsafe { cvlr_new_account_info_unchecked(acc_no) }
+}
+
+mod rt_decls {
+    extern "C" {
+        pub fn CVT_nondet_solana_account_space(acc_no: u64, size: usize) -> *mut u8;
+    }
+}
+
+#[cfg(feature = "rt")]
+mod rt_impls {
+    use std::alloc::{alloc_zeroed, Layout};
+    use solana_program::entrypoint::BPF_ALIGN_OF_U128;
+
+    #[no_mangle]
+    extern "C" fn CVT_nondet_solana_account_space(_acc_no: u64, size: usize) -> *mut u8 {
+        // XXX currently ignore _acc_no and allocate new segment each time
+        unsafe {
+            let layout = Layout::from_size_align_unchecked(size, BPF_ALIGN_OF_U128);
+            let input = alloc_zeroed(layout);
+            input
+        }
+    } 
 }
 
 #[allow(unused_assignments)]
-unsafe fn cvlr_mk_account_info_unchecked() -> AccountInfo<'static> {
+unsafe fn cvlr_new_account_info_unchecked(acc_no: u64) -> AccountInfo<'static> {
     use solana_program::{
         entrypoint::{BPF_ALIGN_OF_U128, MAX_PERMITTED_DATA_INCREASE},
         pubkey::Pubkey,
     };
     use std::{
-        alloc::{alloc, Layout},
+        alloc::Layout,
         cell::RefCell,
         mem::size_of,
         rc::Rc,
     };
 
-    const SIZE: usize = 4 + 4 + 32 + 32 + 8 + 8 + 1 * 1024 + MAX_PERMITTED_DATA_INCREASE + 8;
+    const MB: usize = 1024 * 1024;
+    const SIZE: usize = 4 + 4 + 32 + 32 + 8 + 8 + 8 * MB + MAX_PERMITTED_DATA_INCREASE + 8;
 
     let layout = Layout::from_size_align_unchecked(SIZE, BPF_ALIGN_OF_U128);
-    let input: *mut u8 = alloc(layout);
-    cvlr_nondet::havoc::memhavoc(input, layout.size());
+    let input: *mut u8 = rt_decls::CVT_nondet_solana_account_space(acc_no, layout.size());
 
     let mut offset: usize = 0;
 
