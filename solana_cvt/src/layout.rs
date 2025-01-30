@@ -281,8 +281,8 @@ mod rt_decls {
 
 #[cfg(feature = "rt")]
 mod rt_impls {
-    use std::alloc::{alloc_zeroed, Layout};
     use solana_program::entrypoint::BPF_ALIGN_OF_U128;
+    use std::alloc::{alloc_zeroed, Layout};
 
     #[no_mangle]
     extern "C" fn CVT_nondet_solana_account_space(_acc_no: u64, size: usize) -> *mut u8 {
@@ -292,7 +292,7 @@ mod rt_impls {
             let input = alloc_zeroed(layout);
             input
         }
-    } 
+    }
 }
 
 #[allow(unused_assignments)]
@@ -301,15 +301,12 @@ unsafe fn cvlr_new_account_info_unchecked(acc_no: u64) -> AccountInfo<'static> {
         entrypoint::{BPF_ALIGN_OF_U128, MAX_PERMITTED_DATA_INCREASE},
         pubkey::Pubkey,
     };
-    use std::{
-        alloc::Layout,
-        cell::RefCell,
-        mem::size_of,
-        rc::Rc,
-    };
+    use std::{alloc::Layout, cell::RefCell, mem::size_of, rc::Rc};
 
     const MB: usize = 1024 * 1024;
-    const SIZE: usize = 4 + 4 + 32 + 32 + 8 + 8 + 8 * MB + MAX_PERMITTED_DATA_INCREASE + 8;
+    const MAX_ORIG_DATA_LEN: usize = 8 * MB;
+    const SIZE: usize =
+        4 + 4 + 32 + 32 + 8 + 8 + MAX_ORIG_DATA_LEN + MAX_PERMITTED_DATA_INCREASE + 8;
 
     let layout = Layout::from_size_align_unchecked(SIZE, BPF_ALIGN_OF_U128);
     let input: *mut u8 = rt_decls::CVT_nondet_solana_account_space(acc_no, layout.size());
@@ -344,6 +341,9 @@ unsafe fn cvlr_new_account_info_unchecked(acc_no: u64) -> AccountInfo<'static> {
 
     *(input.add(original_data_len_offset) as *mut u32) = data_len as u32;
 
+    // -- limit size of data to what is allocated
+    cvlr_asserts::cvlr_assume!(data_len <= MAX_ORIG_DATA_LEN);
+
     let data = Rc::new(RefCell::new({
         std::slice::from_raw_parts_mut(input.add(offset), data_len)
     }));
@@ -364,4 +364,25 @@ unsafe fn cvlr_new_account_info_unchecked(acc_no: u64) -> AccountInfo<'static> {
         executable,
         rent_epoch,
     }
+}
+
+pub fn cvlr_nondet_acc_infos() -> [AccountInfo<'static>; 16] {
+    [
+        cvlr_new_account_info(0),
+        cvlr_new_account_info(1),
+        cvlr_new_account_info(2),
+        cvlr_new_account_info(3),
+        cvlr_new_account_info(4),
+        cvlr_new_account_info(5),
+        cvlr_new_account_info(6),
+        cvlr_new_account_info(7),
+        cvlr_new_account_info(8),
+        cvlr_new_account_info(9),
+        cvlr_new_account_info(10),
+        cvlr_new_account_info(11),
+        cvlr_new_account_info(12),
+        cvlr_new_account_info(13),
+        cvlr_new_account_info(14),
+        cvlr_new_account_info(15),
+    ]
 }

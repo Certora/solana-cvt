@@ -7,5 +7,5 @@ pub mod token;
 
 pub use clock::*;
 pub use nondet::*;
-pub use layout::{fun_acc_infos_with_mem_layout, cvlr_new_account_info};
+pub use layout::{fun_acc_infos_with_mem_layout, cvlr_new_account_info, cvlr_nondet_acc_infos};
 
