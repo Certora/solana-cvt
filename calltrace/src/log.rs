@@ -63,10 +63,6 @@ impl_cvlr_log_for_int!(i16);
 impl_cvlr_log_for_int!(i32);
 impl_cvlr_log_for_int!(i64);
 
-
-
-
-
 impl<T: CvlrLog> CvlrLog for &T {
     fn log(&self, tag: &str, logger: &mut CvlrLogger) {
         (**self).log(tag, logger);
@@ -76,6 +72,40 @@ impl<T: CvlrLog> CvlrLog for &T {
 impl CvlrLog for &str {
     fn log(&self, _tag: &str, logger: &mut CvlrLogger) {
         logger.log(*self);
+    }
+}
+
+impl CvlrLog for () {
+    fn log(&self, tag: &str, logger: &mut CvlrLogger) {
+        logger.log(tag);
+        logger.log("()")
+    }
+}
+
+impl<T: CvlrLog> CvlrLog for Option<T> {
+    fn log(&self, tag: &str, logger: &mut CvlrLogger) {
+        if let Some(v) = self {
+            v.log(tag, logger);
+        } else {
+            // XXX need a way to print multiple strings
+            logger.log(tag);
+            logger.log("None");
+        }
+    }
+}
+
+impl<T: CvlrLog, E: CvlrLog> CvlrLog for Result<T, E> {
+    fn log(&self, tag: &str, logger: &mut CvlrLogger) {
+        match self {
+            Ok(v) => {
+                logger.log("Ok");
+                v.log(tag, logger)
+            }
+            Err(v) => {
+                logger.log("Err");
+                v.log(tag, logger)
+            }
+        }
     }
 }
 

@@ -35,3 +35,8 @@ pub use cvlr_early_panic::early_panic as early_panic;
 pub use cvlr_hook::cvt_hook_start as hook_on_entry;
 pub use cvlr_hook::cvt_hook_end as hook_on_exit;
 
+pub mod prelude
+{
+    pub use super::*;
+    pub use asserts::*;
+}
