@@ -269,13 +269,13 @@ macro_rules! acc_infos_with_mem_layout {
     };
 }
 
-pub fn cvlr_new_account_info(acc_no: u64) -> AccountInfo<'static> {
-    unsafe { cvlr_new_account_info_unchecked(acc_no) }
+pub fn cvlr_new_account_info() -> AccountInfo<'static> {
+    unsafe { cvlr_new_account_info_unchecked() }
 }
 
 mod rt_decls {
     extern "C" {
-        pub fn CVT_nondet_solana_account_space(acc_no: u64, size: usize) -> *mut u8;
+        pub fn CVT_nondet_solana_account_space(size: usize) -> *mut u8;
     }
 }
 
@@ -285,8 +285,7 @@ mod rt_impls {
     use std::alloc::{alloc_zeroed, Layout};
 
     #[no_mangle]
-    extern "C" fn CVT_nondet_solana_account_space(_acc_no: u64, size: usize) -> *mut u8 {
-        // XXX currently ignore _acc_no and allocate new segment each time
+    extern "C" fn CVT_nondet_solana_account_space(size: usize) -> *mut u8 {
         unsafe {
             let layout = Layout::from_size_align_unchecked(size, BPF_ALIGN_OF_U128);
             let input = alloc_zeroed(layout);
@@ -296,7 +295,7 @@ mod rt_impls {
 }
 
 #[allow(unused_assignments)]
-unsafe fn cvlr_new_account_info_unchecked(acc_no: u64) -> AccountInfo<'static> {
+unsafe fn cvlr_new_account_info_unchecked() -> AccountInfo<'static> {
     use solana_program::{
         entrypoint::{BPF_ALIGN_OF_U128, MAX_PERMITTED_DATA_INCREASE},
         pubkey::Pubkey,
@@ -309,7 +308,7 @@ unsafe fn cvlr_new_account_info_unchecked(acc_no: u64) -> AccountInfo<'static> {
         4 + 4 + 32 + 32 + 8 + 8 + MAX_ORIG_DATA_LEN + MAX_PERMITTED_DATA_INCREASE + 8;
 
     let layout = Layout::from_size_align_unchecked(SIZE, BPF_ALIGN_OF_U128);
-    let input: *mut u8 = rt_decls::CVT_nondet_solana_account_space(acc_no, layout.size());
+    let input: *mut u8 = rt_decls::CVT_nondet_solana_account_space(layout.size());
 
     let mut offset: usize = 0;
 
@@ -344,9 +343,9 @@ unsafe fn cvlr_new_account_info_unchecked(acc_no: u64) -> AccountInfo<'static> {
     // -- limit size of data to what is allocated
     cvlr_asserts::cvlr_assume!(data_len <= MAX_ORIG_DATA_LEN);
 
-    let data = Rc::new(RefCell::new({
+    let data = Rc::new(RefCell::new(
         std::slice::from_raw_parts_mut(input.add(offset), data_len)
-    }));
+    ));
 
     offset += data_len + MAX_PERMITTED_DATA_INCREASE;
     offset += (offset as *const u8).align_offset(BPF_ALIGN_OF_U128);
@@ -368,21 +367,21 @@ unsafe fn cvlr_new_account_info_unchecked(acc_no: u64) -> AccountInfo<'static> {
 
 pub fn cvlr_nondet_acc_infos() -> [AccountInfo<'static>; 16] {
     [
-        cvlr_new_account_info(0),
-        cvlr_new_account_info(1),
-        cvlr_new_account_info(2),
-        cvlr_new_account_info(3),
-        cvlr_new_account_info(4),
-        cvlr_new_account_info(5),
-        cvlr_new_account_info(6),
-        cvlr_new_account_info(7),
-        cvlr_new_account_info(8),
-        cvlr_new_account_info(9),
-        cvlr_new_account_info(10),
-        cvlr_new_account_info(11),
-        cvlr_new_account_info(12),
-        cvlr_new_account_info(13),
-        cvlr_new_account_info(14),
-        cvlr_new_account_info(15),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
+        cvlr_new_account_info(),
     ]
 }
