@@ -43,10 +43,13 @@ macro_rules! impl_cvlr_log_for_uint {
     };
 }
 
+
+impl_cvlr_log_for_uint!(bool);
 impl_cvlr_log_for_uint!(u8);
 impl_cvlr_log_for_uint!(u16);
 impl_cvlr_log_for_uint!(u32);
 impl_cvlr_log_for_uint!(u64);
+impl_cvlr_log_for_uint!(usize);
 
 macro_rules! impl_cvlr_log_for_int {
     ($t:ty) => {
