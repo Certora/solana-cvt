@@ -11,10 +11,11 @@ macro_rules! impl_bin_assert {
         macro_rules! $name {
             ($lhs: expr, $rhs: expr) => {{
                 $crate::cvlr_log_lineno!();
-                clog!($lhs, $rhs);
-                cvlr_assert!($lhs $pred $rhs);
+                cvlr::clog!($lhs, $rhs);
+                $crate::cvlr_assert!($lhs $pred $rhs);
             }};
         }   
+        pub use $name;
     };
 }
 
