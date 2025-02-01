@@ -1,5 +1,5 @@
 [package]
-name = "nondet"
+name = "cvlr-nondet"
 authors = ["Arie Gurfinkel <arie@certora.com>"]
 version.workspace = true
 edition = "2021"

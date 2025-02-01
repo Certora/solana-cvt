@@ -1,5 +1,5 @@
 [package]
-name = "mathint"
+name = "cvlr-mathint"
 authors = ["Arie Gurfinkel <arie@certora.com>"]
 version.workspace = true
 edition = "2021"
@@ -10,7 +10,7 @@ default = []
 rt = []
 
 [dependencies]
-nondet = { path = "../nondet" }
+cvlr-nondet = { workspace = true }
 
 [dev-dependencies]
-mathint = { path = ".", features = ["rt"] }
+cvlr-mathint = { path = ".", features = ["rt"] }

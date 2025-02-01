@@ -1,5 +1,5 @@
 [package]
-name = "hook-macro"
+name = "cvlr-hook"
 version.workspace = true
 edition = "2021"
 publish = false

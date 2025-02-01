@@ -1,9 +1,8 @@
 [package]
-name = "solana_cvt"
+name = "cvlr-solana"
 authors = ["Arie Gurfinkel <arie@certora.com>"]
 version.workspace = true
 edition = "2021"
-publish = false
 
 [features]
 default = []

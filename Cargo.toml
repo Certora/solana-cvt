@@ -1,16 +1,16 @@
 [workspace]
 resolver = "2"
 members = [
-    "vectors",
-    "cvt",
-    "hook_macro",
-    "early-panic",
-    "nondet",
-    "solana_cvt",
-    "cvt-macros",
-    "stubs",
-    "calltrace",
-    "mathint", "cvlr-asserts",
+    "cvlr",
+    "cvlr-asserts",
+    "cvlr-mathint",
+    "cvlr-log",
+    "cvlr-nondet",
+    "cvlr-early-panic",
+    "cvlr-hook",
+    "cvlr-macros",
+    "cvlr-vectors",
+    "cvlr-solana"
 ]
 
 [workspace.package]
@@ -27,10 +27,10 @@ macrotest = "1"
 trybuild = "1"
 
 cvlr-asserts = { path = "cvlr-asserts" }
-cvlr-mathint = { path = "mathint", package = "mathint" }
-cvlr-nondet = { path = "nondet", package = "nondet" }
-cvlr-log = { path = "calltrace", package = "calltrace" }
-cvlr-vectors = { path = "vectors", package = "vectors" }
-cvlr-macros = { path = "cvt-macros", package = "cvt-macros" }
-cvlr-early-panic = { path = "early-panic", package = "early-panic" }
-cvlr-hook = { path = "hook_macro", package = "hook-macro"}
+cvlr-mathint = { path = "cvlr-mathint" }
+cvlr-nondet = { path = "cvlr-nondet" }
+cvlr-log = { path = "cvlr-log" }
+cvlr-vectors = { path = "cvlr-vectors" }
+cvlr-macros = { path = "cvlr-macros" }
+cvlr-early-panic = { path = "cvlr-early-panic" }
+cvlr-hook = { path = "cvlr-hook" }

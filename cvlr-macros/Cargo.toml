@@ -1,5 +1,5 @@
 [package]
-name = "cvt-macros"
+name = "cvlr-macros"
 version.workspace = true
 authors = ["Arie Gurfinkel <arie@certora.com>"]
 edition = "2021"

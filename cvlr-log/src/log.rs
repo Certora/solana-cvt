@@ -110,7 +110,7 @@ impl<T: CvlrLog, E: CvlrLog> CvlrLog for Result<T, E> {
 }
 
 #[cfg(feature = "mathint")]
-impl CvlrLog for mathint::NativeInt {
+impl CvlrLog for cvlr_mathint::NativeInt {
     fn log(&self, tag: &str, logger: &mut CvlrLogger) {
         logger.log_u64(tag, self.as_internal());
     }

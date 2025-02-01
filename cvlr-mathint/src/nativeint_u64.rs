@@ -194,7 +194,7 @@ impl NativeIntU64 {
     }
 
     pub fn nondet() -> Self {
-        nondet::nondet()
+        cvlr_nondet::nondet()
     }
 
     // Expose internal representation. Internal use only.
@@ -379,7 +379,7 @@ impl From<&[u8]> for NativeIntU64 {
 
 }
 
-impl ::nondet::Nondet for NativeIntU64 {
+impl cvlr_nondet::Nondet for NativeIntU64 {
     fn nondet() -> NativeIntU64 {
         unsafe { Self(CVT_nativeint_u64_nondet()) }
     }

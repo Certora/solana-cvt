@@ -1,5 +1,5 @@
 [package]
-name = "early-panic"
+name = "cvlr-early-panic"
 version.workspace = true
 authors = ["Arie Gurfinkel <arie@certora.com>"]
 edition = "2021"
