@@ -6,7 +6,7 @@ edition = "2021"
 publish = false
 
 [features]
-deafult = ["mathint"]
+default = ["mathint"]
 rt = ["mathint/rt"]
 mathint = ["dep:mathint"]
 
