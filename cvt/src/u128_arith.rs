@@ -1,24 +1,39 @@
-#[allow(improper_ctypes)]
-extern "C" {
-    fn CVT_u128_leq_c(x: u128, y:u128) -> bool;
-    fn CVT_u128_gt0_c(x: u128) -> bool;
-    fn CVT_u128_ceil_div_c(x: u128, y: u128) -> u128;
+mod rt_decls {
+    #[allow(improper_ctypes)]
+    extern "C" {
+        pub fn CVT_u128_leq(x: u128, y: u128) -> bool;
+        pub fn CVT_u128_gt0(x: u128) -> bool;
+        pub fn CVT_u128_ceil_div(x: u128, y: u128) -> u128;
+    }
 }
 
-#[inline(never)]
-#[allow(non_snake_case)]
-pub fn CVT_u128_leq(x: u128, y:u128) -> bool  {
-    return unsafe { CVT_u128_leq_c(x, y) }
+#[cfg(feature = "rt")]
+#[allow(improper_ctypes_definitions)]
+mod rt_impls {
+    #[no_mangle]
+    pub extern "C" fn CVT_u128_leq(x: u128, y: u128) -> bool {
+        x <= y
+    }
+
+    #[no_mangle]
+    pub extern "C" fn CVT_u128_gt0(x: u128) -> bool {
+        x > 0
+    }
+
+    #[no_mangle]
+    pub extern "C" fn CVT_u128_ceil_div(x: u128, y: u128) -> u128 {
+        x.div_ceil(y)
+    }
 }
 
-#[inline(never)]
-#[allow(non_snake_case)]
-pub fn CVT_u128_gt0(x: u128) -> bool  {
-    return unsafe { CVT_u128_gt0_c(x) }
+pub fn cvlr_u128_leq(x: u128, y: u128) -> bool {
+    unsafe { rt_decls::CVT_u128_leq(x, y) }
 }
 
-#[inline(never)]
-#[allow(non_snake_case)]
-pub fn CVT_u128_ceil_div(x: u128, y:u128) -> u128  {
-    return unsafe { CVT_u128_ceil_div_c(x, y) }
+pub fn cvlr_u128_gt0(x: u128) -> bool {
+    unsafe { rt_decls::CVT_u128_gt0(x) }
+}
+
+pub fn cvlr_u128_ceil_div(x: u128, y: u128) -> u128 {
+    unsafe { rt_decls::CVT_u128_ceil_div(x, y) }
 }
