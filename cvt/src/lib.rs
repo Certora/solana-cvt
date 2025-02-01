@@ -1,7 +1,5 @@
 #![no_std]
 
-pub mod cvt_asserts;
-
 pub mod u128_arith;
 
 pub mod asserts {
