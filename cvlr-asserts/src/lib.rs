@@ -1,4 +1,5 @@
 mod core;
+mod asserts;
 
 pub use core::*;
 
