@@ -80,8 +80,7 @@ impl CvlrLog for &str {
 
 impl CvlrLog for () {
     fn log(&self, tag: &str, logger: &mut CvlrLogger) {
-        logger.log(tag);
-        logger.log("()")
+        logger.log_str(tag, "()");
     }
 }
 
@@ -90,9 +89,7 @@ impl<T: CvlrLog> CvlrLog for Option<T> {
         if let Some(v) = self {
             v.log(tag, logger);
         } else {
-            // XXX need a way to print multiple strings
-            logger.log(tag);
-            logger.log("None");
+            logger.log_str(tag, "None");
         }
     }
 }
