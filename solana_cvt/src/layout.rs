@@ -262,12 +262,22 @@ pub fn fun_acc_infos_with_mem_layout() -> [AccountInfo<'static>; 16] {
     ];
 }
 
+// #[macro_export]
+// macro_rules! acc_infos_with_mem_layout {
+//     () => {
+//         $crate::fun_acc_infos_with_mem_layout()
+//     };
+// }
+
 #[macro_export]
 macro_rules! acc_infos_with_mem_layout {
     () => {
-        $crate::fun_acc_infos_with_mem_layout()
+        $crate::cvlr_deserialize_nondet_accounts()
     };
 }
+
+
+
 
 pub fn cvlr_new_account_info() -> AccountInfo<'static> {
     unsafe { cvlr_new_account_info_unchecked() }
