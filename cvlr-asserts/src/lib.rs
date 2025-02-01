@@ -3,6 +3,7 @@ pub mod asserts;
 
 pub use core::*;
 
+#[deprecated = "Replaced by cvlr"]
 pub mod cvt {
     pub use crate::cvlr_assert as cvt_assert;
     pub use crate::cvlr_assume as cvt_assume;
