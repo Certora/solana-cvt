@@ -365,7 +365,7 @@ unsafe fn cvlr_new_account_info_unchecked() -> AccountInfo<'static> {
     }
 }
 
-pub fn cvlr_nondet_acc_infos() -> [AccountInfo<'static>; 16] {
+pub fn cvlr_deserialize_nondet_accounts() -> [AccountInfo<'static>; 16]  {
     [
         cvlr_new_account_info(),
         cvlr_new_account_info(),
@@ -385,3 +385,4 @@ pub fn cvlr_nondet_acc_infos() -> [AccountInfo<'static>; 16] {
         cvlr_new_account_info(),
     ]
 }
+

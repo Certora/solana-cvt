@@ -18,3 +18,4 @@ arrayref = "0.3"
 cvlr-asserts = { workspace = true }
 cvlr-nondet = { workspace = true }
 cvlr-mathint = { workspace = true }
+cvlr-log = { workspace = true }
