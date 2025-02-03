@@ -5,7 +5,7 @@ pub trait CvlrLog {
 }
 
 #[inline(always)]
-pub fn cvlr_log_<T: CvlrLog>(tag: &str, val: &T, logger: &mut CvlrLogger) {
+pub fn cvlr_log_with<T: CvlrLog>(tag: &str, val: &T, logger: &mut CvlrLogger) {
     val.log(tag, logger);
 }
 
@@ -19,6 +19,10 @@ pub fn cvlr_log<T: CvlrLog>(tag: &str, val: &T) {
 macro_rules! cvlr_log {
     ($v:expr => $t:expr) => {
         $crate::cvlr_log($t, &($v));
+    };
+
+    ($v:expr => $t:expr ; $l:ident) => {
+        $crate::cvlr_log_with($t, &($v), $l)
     };
 
     ($v:expr) => {
