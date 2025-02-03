@@ -360,7 +360,8 @@ unsafe fn cvlr_new_account_info_unchecked() -> AccountInfo<'static> {
     offset += data_len + MAX_PERMITTED_DATA_INCREASE;
     offset += (offset as *const u8).align_offset(BPF_ALIGN_OF_U128);
 
-    let rent_epoch = *(input.add(offset) as *const u64);
+    // let rent_epoch = *(input.add(offset) as *const u64);
+    let rent_epoch = cvlr_nondet::nondet::<u64>();
     offset += size_of::<u64>();
 
     AccountInfo {
