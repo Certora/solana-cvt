@@ -1,4 +1,4 @@
-use early_panic::early_panic;
+use cvlr_early_panic::early_panic;
 use std::str::FromStr;
 
 #[early_panic]
